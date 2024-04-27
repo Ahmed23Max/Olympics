@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Confirmation de Billet - Jeux Olympiques 2024
+{% endblock %}
+
+{% block content %}
+<section class="ticket-confirmation">
+    <div class="container">
+        <h2>Confirmation de Billet</h2>
+        <div class="confirmation-details">
+            <p>Merci pour votre sélection. Votre billet de type <strong>{{ ticket_type }}</strong> a été confirmé.</p>
+            <!-- Vous pouvez ajouter d'autres détails de confirmation ici si nécessaire -->
+        </div>
+        <div class="actions">
+            <a href="{{ url_for('tickets') }}" class="btn btn-primary">Retour à la sélection des billets</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Retour à l'accueil</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

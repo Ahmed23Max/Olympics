@@ -1,0 +1,110 @@
+/* Styles pour le header */
+header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+header h1 {
+    font-size: 2.5rem;
+}
+
+nav ul {
+    padding: 0;
+    list-style: none;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Custom CSS for navbar */
+.navbar-nav .nav-item .nav-link {
+    color: white;
+}
+
+/* Styles pour la section de la bannière */
+.banner {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.banner img {
+    max-width: 100%;
+}
+
+.welcome-message h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.welcome-message p {
+    font-size: 1.2rem;
+}
+
+/* Styles pour la section d'informations */
+.info-section {
+    padding: 50px 0;
+}
+
+.info-section h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Styles pour le footer */
+footer {
+    text-align: center;
+    padding: 20px 0;
+}
+/* Style pour le pop-up modal */
+.modal {
+    display: none; /* Par défaut, le pop-up est caché */
+    position: fixed; /* Position fixe pour que le pop-up reste au même endroit lors du défilement */
+    z-index: 1; /* Mettre le pop-up au-dessus de tout autre contenu */
+    left: 0;
+    top: 0;
+    width: 100%; /* Couvrir toute la largeur de la fenêtre */
+    height: 100%; /* Couvrir toute la hauteur de la fenêtre */
+    background-color: rgba(0,0,0,0.4); /* Fond semi-transparent pour assombrir le contenu arrière-plan */
+    overflow: auto; /* Activer le défilement si nécessaire */
+}
+
+/* Style pour le contenu du pop-up */
+.modal-content {
+    background-color: #fefefe; /* Fond blanc pour le contenu du pop-up */
+    margin: auto; /* Centre horizontalement */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Largeur du pop-up */
+    max-width: 600px; /* Largeur maximale du pop-up */
+    position: relative; /* Position relative pour positionner le bouton de fermeture */
+}
+
+/* Style pour le bouton de fermeture */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Centrer verticalement le pop-up */
+@media screen and (max-height: 700px) {
+    .modal-content {
+        overflow: auto;
+    }
+}

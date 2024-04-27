@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Accueil - Jeux Olympiques 2024
+{% endblock %}
+
+{% block content %}
+<section class="banner">
+    <div class="container">
+        <img src="{{ url_for('static', filename='Olympic_flag.svg') }}" class="img-fluid" alt="Bannière des Jeux Olympiques 2024">
+        <div class="welcome-message">
+            <h2>Bienvenue aux Jeux Olympiques 2024</h2>
+            <p>Explorez et réservez vos billets dès maintenant pour cet événement historique !</p>
+            <a href="{{ url_for('tickets') }}" class="btn btn-primary btn-lg">Réservez vos billets</a>
+        </div>
+    </div>
+</section>
+<section class="info-section">
+    <div class="container">
+        <h2>Informations principales</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h3>Dates</h3>
+                    <p>24 juillet - 9 août 2024</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h3>Lieux</h3>
+                    <p>Paris, France</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h3>Événements</h3>
+                    <p>Plus de 40 sports différents</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
