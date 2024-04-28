@@ -5,18 +5,20 @@
 {% endblock %}
 
 {% block content %}
+<!-- Ajout de l'image de fond -->
+<div class="background-image"></div>
+
 <section class="event-list">
     <div class="container">
-        <h2>Épreuves Sportives</h2>
+        <h2 class="event-title">Épreuves Sportives</h2>
         <div class="row">
             {% for discipline in disciplines %}
             <div class="col-lg-4 col-md-6">
                 <div class="event-card">
-                    <img src="{{ url_for('static', filename='{{ discipline.logo }}') }}" alt="{{ discipline.name }}">
                     <div class="event-details">
                         <h3>{{ discipline.name }}</h3>
                         <p>{{ discipline.description }}</p>
-                        <a href="#" class="btn btn-primary">Voir plus</a>
+                        <a href="{{ url_for('discipline_details', discipline_id=loop.index0) }}" class="btn btn-primary">Voir plus</a>
                     </div>
                 </div>
             </div>
@@ -25,3 +27,4 @@
     </div>
 </section>
 {% endblock %}
+

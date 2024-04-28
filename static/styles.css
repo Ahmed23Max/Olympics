@@ -108,3 +108,111 @@ footer {
         overflow: auto;
     }
 }
+
+
+/* Ajout d'un style pour l'image de fond */
+.background-image {
+    background-image: url('epreuve.jpeg');
+    background-size: cover;
+    background-position: center;
+    height: 300px; /* Ajustez la hauteur selon vos besoins */
+    margin-bottom: 30px; /* Ajoute un espace en bas de l'image */
+}
+
+/* Style pour le titre des épreuves */
+.event-title {
+    font-size: 28px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Style pour les cartes d'événements */
+.event-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s ease;
+}
+
+.event-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style pour les détails de l'événement */
+.event-details {
+    text-align: center;
+}
+
+/* Style pour le bouton "Voir plus" */
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Ajout de styles pour la section du plan du site */
+.site-map {
+    text-align: center;
+}
+
+/* Ajout de styles pour l'image du plan */
+.site-map img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px; /* Ajoute des coins arrondis à l'image */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ajoute une ombre légère à l'image */
+    margin-top: 20px; /* Ajoute un espace en haut de l'image */
+}
+/* Styles pour la section des informations pratiques */
+.practical-info {
+    padding: 50px 0; /* Ajoute de l'espace autour du contenu */
+    text-align: center;
+}
+
+/* Styles pour chaque catégorie d'informations */
+.info-category {
+    margin-bottom: 40px; /* Ajoute de l'espace entre chaque catégorie */
+}
+
+.info-category h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333; /* Couleur du texte */
+}
+
+.info-category p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #666; /* Couleur du texte */
+}
+
+        /* Custom CSS for hamburger menu and logo positioning */
+.navbar-brand img {
+            max-height: 40px;
+}
+
+.navbar-toggler {
+            border: none;
+            padding: 0;
+}
+
+.navbar-toggler-icon {
+            background-image: url('path_to_hamburger_icon.png'); /* Replace 'path_to_hamburger_icon.png' with the path to your hamburger icon image */
+            width: 40px; /* Adjust as needed */
+            height: 40px; /* Adjust as needed */
+            background-size: contain;
+}
+
+.navbar-toggler:focus {
+            outline: none;
+}

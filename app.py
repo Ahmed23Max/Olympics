@@ -61,9 +61,12 @@ disciplines = [
 def events():
     return render_template('events.html', disciplines=disciplines)
 
-@app.route('/news')
-def news():
-    return render_template('news.html')
+@app.route('/discipline/<int:discipline_id>')
+def discipline_details(discipline_id):
+    # Récupérer les détails de la discipline à partir de l'ID
+    discipline = disciplines[discipline_id]
+    return render_template('discipline_details.html', discipline=discipline)
+
 
 @app.route('/practical-info')
 def practical_info():

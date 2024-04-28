@@ -1,0 +1,179 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Détails de {{ discipline.name }} - Jeux Olympiques 2024
+{% endblock %}
+
+{% block content %}
+<section class="discipline-details">
+    <div class="container">
+        <h2>{{ discipline.name }}</h2>
+        <img src="{{ discipline.logo }}" alt="{{ discipline.name }} Logo" class="img-fluid">
+        <p>{{ discipline.description }}</p>
+        <h3>Faits intéressants sur {{ discipline.name }}</h3>
+        <ul>
+            {% if discipline.name == "Athlétisme" %}
+                <li>Le record du monde du 100 mètres masculin est de 9,58 secondes, établi par Usain Bolt en 2009.</li>
+                <li>Le saut en hauteur masculin a vu des records incroyables, avec une hauteur maximale de plus de 2,45 mètres.</li>
+                <li>Le marathon, l'une des épreuves emblématiques de l'athlétisme, a une distance officielle de 42,195 kilomètres.</li>
+            {% elif discipline.name == "Aviron" %}
+                <li>L'aviron est l'un des sports olympiques les plus anciens, avec des compétitions remontant aux Jeux Olympiques de 1900.</li>
+                <li>Une épreuve d'aviron traditionnelle est le huit avec barreur, où huit rameurs propulsent le bateau à travers l'eau.</li>
+                <li>L'aviron est réputé pour être un excellent exercice cardiovasculaire et de renforcement musculaire.</li>
+            {% elif discipline.name == "Badminton" %}
+                <li>Le badminton est le sport de raquette le plus rapide, avec des volants pouvant atteindre des vitesses de plus de 400 km/h.</li>
+                <li>La Chine est traditionnellement dominante en badminton, remportant de nombreuses médailles d'or aux Jeux Olympiques.</li>
+                <li>Le badminton est également connu sous le nom de "tennis de salon" dans certains pays.</li>
+            {% elif discipline.name == "Basket-ball à 5" %}
+                <li>Le basket-ball est l'un des sports les plus populaires au monde, avec des millions de joueurs et de fans à travers le globe.</li>
+                <li>Les États-Unis sont largement considérés comme la puissance dominante du basket-ball, ayant remporté de nombreux titres olympiques.</li>
+                <li>Le basket-ball a été inventé en 1891 par James Naismith, un instructeur d'éducation physique au Massachusetts, États-Unis.</li>
+            {% elif discipline.name == "Basket 3x3" %}
+                <li>Le basket 3x3 est une version plus rapide et plus dynamique du basket-ball traditionnel, se jouant avec trois joueurs de chaque côté sur un demi-terrain.</li>
+                <li>Le basket 3x3 est devenu une discipline olympique aux Jeux Olympiques de la Jeunesse de 2010 à Singapour.</li>
+                <li>Le basket 3x3 est particulièrement populaire dans les environnements urbains et les tournois de rue à travers le monde.</li>
+            {% elif discipline.name == "Boxe" %}
+                <li>La boxe est l'un des sports de combat les plus anciens, remontant à l'Antiquité, avec des compétitions enregistrées dès 688 avant notre ère.</li>
+                <li>La boxe olympique se pratique avec des gants de 10 onces et se compose de trois rounds de trois minutes chacun.</li>
+                <li>La boxe féminine a été introduite aux Jeux Olympiques en 2012 à Londres.</li>
+            {% elif discipline.name == "Breakdance" %}
+                <li>Le breakdance, également connu sous le nom de break, est un style de danse de rue originaire des quartiers urbains de New York dans les années 1970.</li>
+                <li>Le breakdance est caractérisé par des mouvements acrobatiques, des figures au sol et des isolations du corps en rythme avec la musique hip-hop.</li>
+                <li>Le breakdance fera ses débuts olympiques aux Jeux Olympiques de Paris 2024 en tant que nouvelle discipline sportive.</li>
+            {% elif discipline.name == "Canoë-Kayak Course en Ligne" %}
+                <li>La course en ligne de canoë-kayak se déroule sur des distances de 200, 500, 1000 ou 5000 mètres, avec des épreuves individuelles et par équipes.</li>
+                <li>Le canoë-kayak est un sport qui exige à la fois force, endurance et coordination pour manœuvrer efficacement le bateau sur l'eau.</li>
+                <li>Le canoë-kayak est également pratiqué en eau vive, où les athlètes naviguent à travers des rapides et des obstacles naturels.</li>
+            {% elif discipline.name == "Canoë-Kayak Slalom" %}
+                <li>Le slalom de canoë-kayak se déroule sur des parcours d'eau vive, où les athlètes doivent naviguer à travers une série de portes suspendues dans le courant.</li>
+                <li>Le slalom de canoë-kayak est un sport technique qui exige une grande agilité et une lecture précise de l'eau pour réussir les parcours avec le meilleur temps.</li>
+                <li>Le slalom de canoë-kayak est souvent comparé à une combinaison de ski alpin et de slalom en ski nautique.</li>
+            {% elif discipline.name == "BMX" %}
+                <li>Le BMX, ou vélo-cross, est un sport de vélo extrême qui consiste à parcourir un circuit de terre parsemé de bosses, de virages relevés et de sauts.</li>
+                <li>Le BMX est devenu une discipline olympique aux Jeux Olympiques de Pékin en 2008, avec des épreuves de course BMX et de BMX freestyle.</li>
+                <li>Le BMX freestyle comprend des figures acrobatiques réalisées sur des rampes, des rails et d'autres obstacles, évaluées par des juges sur la base de la difficulté, de l'exécution et de la créativité.</li>
+            {% elif discipline.name == "VTT" %}
+                <li>Le VTT, ou vélo tout-terrain, est une discipline de cyclisme qui se pratique sur des terrains accidentés, tels que des sentiers de montagne, des forêts et des parcours naturels.</li>
+                <li>Le VTT est caractérisé par des descentes rapides, des montées abruptes, des obstacles naturels et des passages techniques qui mettent à l'épreuve les compétences des coureurs.</li>
+                <li>Le VTT est devenu une discipline olympique aux Jeux Olympiques d'Atlanta en 1996, avec des épreuves de cross-country masculin et féminin.</li>
+            {% elif discipline.name == "Cyclisme sur Piste" %}
+                <li>Le cyclisme sur piste se déroule sur un vélodrome en forme d'anneau, avec des épreuves telles que la vitesse, la poursuite, le keirin et l'omnium.</li>
+                <li>Les coureurs de cyclisme sur piste utilisent des vélos spécialement conçus avec des roues à rayons fins et des guidons aérodynamiques pour maximiser leur vitesse sur la piste.</li>
+                <li>Le record du monde de l'heure, où un coureur tente de parcourir la plus grande distance possible en une heure, est l'une des épreuves les plus prestigieuses du cyclisme sur piste.</li>
+            {% elif discipline.name == "Cyclisme sur Route" %}
+                <li>Le cyclisme sur route se déroule sur des routes publiques ou fermées, avec des épreuves de course en ligne et de contre-la-montre individuel et par équipes.</li>
+                <li>Les grandes épreuves de cyclisme sur route incluent le Tour de France, le Giro d'Italia et la Vuelta a España, qui attirent les meilleurs coureurs du monde.</li>
+                <li>Le cyclisme sur route exige à la fois des qualités physiques et tactiques, avec des courses souvent marquées par des échappées, des sprints et des ascensions de montagne.</li>
+            {% elif discipline.name == "Équitation" %}
+                <li>L'équitation est un sport olympique composé de trois disciplines : le saut d'obstacles, le dressage et le concours complet.</li>
+                <li>L'équitation est unique en tant que sport olympique car il met en jeu la relation entre un cavalier et son cheval, qui doivent travailler en harmonie pour réussir.</li>
+                <li>Les cavaliers olympiques représentent souvent une variété de disciplines équestres, allant du dressage classique à la compétition équestre de haut niveau.</li>
+            {% elif discipline.name == "Escalade" %}
+                <li>L'escalade est un sport olympique qui se déroule sur des murs artificiels avec différentes voies de difficulté, y compris la vitesse, le bloc et la difficulté.</li>
+                <li>Les grimpeurs olympiques doivent combiner force, agilité, endurance et technique pour réussir sur les murs d'escalade de compétition.</li>
+                <li>L'escalade fera ses débuts olympiques aux Jeux Olympiques de Tokyo 2020 en tant que nouvelle discipline sportive.</li>
+            {% elif discipline.name == "Escrime" %}
+                <li>L'escrime est un sport de combat où les athlètes utilisent des armes blanches, telles que l'épée, le fleuret et le sabre, pour marquer des touches sur l'adversaire.</li>
+                <li>L'escrime exige à la fois des compétences tactiques et physiques, avec des mouvements rapides, des parades précises et des attaques stratégiques.</li>
+                <li>L'escrime est l'un des sports olympiques les plus anciens, remontant aux Jeux Olympiques de l'Antiquité grecque.</li>
+            {% elif discipline.name == "Football" %}
+                <li>Le football, également connu sous le nom de soccer dans certains pays, est le sport le plus populaire au monde, avec des milliards de fans à travers le globe.</li>
+                <li>La Coupe du Monde de la FIFA est l'une des compétitions sportives les plus regardées au monde, attirant des millions de spectateurs à chaque édition.</li>
+                <li>Le football est un sport universel qui transcende les barrières culturelles, linguistiques et géographiques, unifiant les gens à travers leur passion commune pour le jeu.</li>
+            {% elif discipline.name == "Golf" %}
+                <li>Le golf est un sport de précision où les joueurs utilisent des clubs pour frapper une balle dans un trou en un minimum de coups sur un parcours de golf.</li>
+                <li>Le golf est unique en tant que sport olympique car il se joue sur un parcours de 18 trous, avec des compétitions individuelles et par équipes.</li>
+                <li>Le golf est revenu aux Jeux Olympiques aux Jeux de Rio 2016 après une absence de 112 ans, avec des épreuves masculines et féminines.</li>
+            {% elif discipline.name == "Gymnastique Artistique" %}
+                <li>La gymnastique artistique est un sport olympique où les athlètes exécutent des routines complexes de mouvements acrobatiques, de sauts, de pirouettes et de déséquilibres sur différents agrès.</li>
+                <li>La gymnastique artistique exige à la fois force, souplesse, équilibre, agilité et grâce, avec des compétitions se déroulant sur quatre agrès masculins et quatre agrès féminins.</li>
+                <li>La gymnastique artistique est souvent considérée comme l'une des disciplines les plus exigeantes sur le plan physique et mental aux Jeux Olympiques.</li>
+            {% elif discipline.name == "Gymnastique Rythmique" %}
+                <li>La gymnastique rythmique est une discipline artistique qui combine des mouvements de danse, de ballet et de manipulation d'engins tels que le ruban, le cerceau et la corde.</li>
+                <li>La gymnastique rythmique est caractérisée par des mouvements gracieux, des lancers précis et des chorégraphies synchronisées avec la musique.</li>
+                <li>La gymnastique rythmique est souvent comparée à une forme de danse avec des éléments acrobatiques et de manipulation d'engins.</li>
+            {% elif discipline.name == "Trampoline" %}
+                <li>Le trampoline est une discipline de gymnastique acrobatique où les athlètes exécutent des sauts et des figures spectaculaires sur un trampoline élastique.</li>
+                <li>Le trampoline olympique comprend des épreuves individuelles masculines et féminines, avec des routines composées de combinaisons de sauts, de flips et de vrilles.</li>
+                <li>Le trampoline est l'une des disciplines les plus récentes ajoutées aux Jeux Olympiques, faisant ses débuts aux Jeux de Sydney 2000.</li>
+            {% elif discipline.name == "Haltérophilie" %}
+                <li>L'haltérophilie est un sport de force où les athlètes tentent de soulever le plus de poids possible dans deux mouvements principaux : l'arraché et l'épaulé-jeté.</li>
+                <li>L'haltérophilie exige à la fois force brute, technique et concentration mentale pour réussir des levées maximales en compétition.</li>
+                <li>L'haltérophilie est souvent considérée comme l'une des épreuves les plus spectaculaires et exigeantes des Jeux Olympiques.</li>
+            {% elif discipline.name == "Handball" %}
+                <li>Le handball est un sport d'équipe rapide et dynamique où les joueurs utilisent leurs mains pour passer, dribbler et tirer le ballon dans le but adverse.</li>
+                <li>Le handball se joue à l'intérieur sur un terrain de dimensions similaires à un terrain de basket-ball, avec des équipes de sept joueurs, dont un gardien de but.</li>
+                <li>Le handball est originaire d'Europe, où il est particulièrement populaire dans des pays tels que la France, l'Allemagne et le Danemark.</li>
+            {% elif discipline.name == "Hockey sur Gazon" %}
+                <li>Le hockey sur gazon est un sport d'équipe dynamique où les joueurs utilisent des bâtons pour frapper une balle dans le but adverse.</li>
+                <li>Le hockey sur gazon se joue sur un terrain en gazon naturel ou synthétique, avec des équipes de onze joueurs, y compris un gardien de but.</li>
+                <li>Le hockey sur gazon est un sport olympique qui combine vitesse, agilité et stratégie collective pour réussir.</li>
+            {% elif discipline.name == "Judo" %}
+                <li>Le judo est un art martial japonais moderne qui se concentre sur les projections, les contrôles au sol et les techniques de soumission pour vaincre l'adversaire.</li>
+                <li>Le judo se pratique sur un tatami, où les athlètes s'affrontent pour marquer des ippons (victoires décisives) par des techniques de lancer ou de contrôle.</li>
+                <li>Le judo est un sport de combat équitable et respectueux, mettant l'accent sur la discipline personnelle et le respect mutuel entre les compétiteurs.</li>
+            {% elif discipline.name == "Lutte" %}
+                <li>La lutte est l'un des sports de combat les plus anciens, avec des compétitions enregistrées remontant à l'Antiquité grecque et romaine.</li>
+                <li>La lutte olympique se pratique debout et au sol, avec des compétitions dans deux styles : la lutte libre et la lutte gréco-romaine.</li>
+                <li>La lutte exige à la fois force, agilité, endurance et technique pour contrôler et vaincre l'adversaire dans un combat corps à corps.</li>
+            {% elif discipline.name == "Natation" %}
+                <li>La natation est l'un des sports olympiques les plus populaires, avec des épreuves de course en piscine, en eau libre et en relais.</li>
+                <li>Les records du monde en natation sont constamment battus grâce aux avancées dans la technologie des maillots de bain, des bassins de compétition et de l'entraînement.</li>
+                <li>La natation est un excellent exercice cardiovasculaire et de renforcement musculaire, avec des bienfaits pour la santé mentale et physique.</li>
+            {% elif discipline.name == "Natation Artistique" %}
+                <li>La natation artistique, anciennement connue sous le nom de natation synchronisée, est une discipline artistique qui combine la natation, la danse et la gymnastique dans l'eau.</li>
+                <li>La natation artistique se caractérise par des mouvements gracieux, des formations synchronisées et des figures acrobatiques exécutées en musique.</li>
+                <li>La natation artistique est souvent considérée comme l'une des disciplines les plus esthétiques et exigeantes des Jeux Olympiques.</li>
+            {% elif discipline.name == "Plongeon" %}
+                <li>Le plongeon est une discipline de natation artistique qui se concentre sur l'exécution de sauts spectaculaires et de figures acrobatiques depuis des plateformes et des tremplins.</li>
+                <li>Les plongeurs olympiques sont jugés sur la technique, la grâce, la hauteur, la rotation et l'entrée dans l'eau lors de leurs plongeons.</li>
+                <li>Le plongeon comprend des épreuves individuelles masculines et féminines, ainsi que des épreuves synchronisées où les plongeurs sautent ensemble.</li>
+            {% elif discipline.name == "Water-Polo" %}
+                <li>Le water-polo est un sport d'équipe aquatique où les joueurs utilisent leurs mains pour passer, tirer et intercepter un ballon flottant dans l'eau.</li>
+                <li>Le water-polo se joue dans une piscine avec une profondeur suffisante pour permettre aux joueurs de nager et de plonger tout en jouant.</li>
+                <li>Le water-polo est un sport physique et exigeant qui combine natation, stratégie tactique et précision de tir pour réussir.</li>
+            {% elif discipline.name == "Pentathlon Moderne" %}
+                <li>Le pentathlon moderne est une épreuve multisport qui comprend cinq disciplines : l'escrime, la natation, l'équitation, le tir et la course à pied.</li>
+                <li>Le pentathlon moderne a été créé par le baron Pierre de Coubertin, le fondateur des Jeux Olympiques modernes, pour représenter les compétences d'un soldat de cavalerie.</li>
+                <li>Le pentathlon moderne est l'une des épreuves les plus exigeantes des Jeux Olympiques, mettant à l'épreuve l'endurance, la force mentale et la polyvalence des athlètes.</li>
+            {% elif discipline.name == "Rugby à 7" %}
+                <li>Le rugby à 7 est une version plus rapide et plus dynamique du rugby à XV, se jouant avec sept joueurs de chaque côté sur un terrain de taille normale.</li>
+                <li>Le rugby à 7 est devenu une discipline olympique aux Jeux Olympiques de Rio 2016, avec des équipes masculines et féminines en compétition pour la médaille d'or.</li>
+                <li>Le rugby à 7 est particulièrement populaire dans les pays anglophones, ainsi que dans les îles du Pacifique et dans d'autres régions du monde.</li>
+            {% elif discipline.name == "Skateboard" %}
+                <li>Le skateboard est un sport de glisse qui implique la manipulation d'une planche à roulettes sur des surfaces urbaines, telles que les rues, les rampes et les parcs de skate.</li>
+                <li>Le skateboard est une discipline olympique qui comprend des épreuves de street et de park, où les skateurs réalisent des figures et des tricks pour impressionner les juges.</li>
+                <li>Le skateboard est profondément enraciné dans la culture urbaine et la musique alternative, avec une communauté mondiale de skateurs passionnés et créatifs.</li>
+            {% elif discipline.name == "Surf" %}
+                <li>Le surf est un sport de glisse qui consiste à monter et à naviguer sur les vagues de l'océan à l'aide d'une planche de surf.</li>
+                <li>Le surf est un mode de vie pour de nombreux passionnés, avec une culture riche en musique, en art et en style de vie décontracté inspiré par l'océan.</li>
+                <li>Le surf est devenu une discipline olympique aux Jeux Olympiques de Tokyo 2020, avec des épreuves masculines et féminines disputées sur les célèbres vagues de Tsurigasaki Beach.</li>
+            {% elif discipline.name == "Taekwondo" %}
+                <li>Le taekwondo est un art martial coréen moderne qui se concentre sur les techniques de pieds, de poings et de coups de pied sautés pour marquer des points sur l'adversaire.</li>
+                <li>Le taekwondo est un sport olympique où les athlètes combattent sur un tatami pour marquer des points en touchant des zones spécifiques du corps de l'adversaire.</li>
+                <li>Le taekwondo est également une discipline de forme et de compétition poomsae, qui met l'accent sur la précision des mouvements et la fluidité des enchaînements.</li>
+            {% elif discipline.name == "Tennis" %}
+                <li>Le tennis est un sport de raquette qui se joue sur un court rectangulaire avec un filet au milieu, où les joueurs s'affrontent pour frapper une balle avec des raquettes dans le but de marquer des points.</li>
+                <li>Le tennis est un sport olympique avec des épreuves individuelles et par équipes, avec des tournois masculins et féminins disputés sur différentes surfaces telles que le gazon, l'argile et le dur.</li>
+                <li>Le tennis est l'un des sports les plus populaires au monde, avec des tournois prestigieux tels que Wimbledon, l'US Open, l'Open d'Australie et Roland-Garros.</li>
+            {% elif discipline.name == "Tir" %}
+                <li>Le tir est un sport de précision où les athlètes utilisent des armes à feu pour tirer sur des cibles à différentes distances et dans différentes positions.</li>
+                <li>Le tir comprend plusieurs disciplines olympiques, dont le tir à la carabine, le tir au pistolet, le tir de fosse et le tir à l'arc, avec des épreuves de précision et de vitesse.</li>
+                <li>Le tir est un sport exigeant qui met à l'épreuve la concentration, la maîtrise de soi et la précision des athlètes pour réussir.</li>
+            {% elif discipline.name == "Tir à l'Arc" %}
+                <li>Le tir à l'arc est un sport de précision où les archers utilisent un arc pour tirer des flèches sur une cible à différentes distances.</li>
+                <li>Le tir à l'arc est l'un des plus anciens sports de compétition, remontant à des millénaires dans les cultures du monde entier, de l'Égypte ancienne à la Chine impériale.</li>
+                <li>Le tir à l'arc est un sport olympique avec des épreuves individuelles et par équipes, où les archers visent à marquer des points en touchant des zones spécifiques de la cible.</li>
+            {% elif discipline.name == "Triathlon" %}
+                <li>Le triathlon est une épreuve multisport qui combine la natation, le cyclisme et la course à pied dans une séquence continue et sans interruption.</li>
+                <li>Le triathlon exige à la fois endurance cardiovasculaire et musculaire, ainsi qu'une transition fluide entre les disciplines pour réussir.</li>
+                <li>Le triathlon est devenu une discipline olympique aux Jeux Olympiques de Sydney 2000, avec des épreuves masculines et féminines disputées sur des distances variées.</li>
+            {% elif discipline.name == "Voile" %}
+                <li>La voile est un sport nautique qui se pratique sur l'eau avec des voiliers propulsés par le vent, où les navigateurs s'affrontent pour naviguer sur des parcours de course définis.</li>
+                <li>La voile comprend plusieurs classes de bateaux, y compris les dériveurs, les catamarans, les dériveurs solitaires et les voiliers de course en équipage.</li>
+                <li>La voile est un sport exigeant qui met à l'épreuve les compétences de navigation, la stratégie tactique et la capacité à exploiter les conditions météorologiques pour gagner.</li>
+            {% endif %}
+        </ul>
+    </div>
+</section>
+{% endblock %}
