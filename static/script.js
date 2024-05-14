@@ -54,3 +54,15 @@ document.getElementById('ticketForm').addEventListener('submit', function(event)
     // Une fois le traitement terminé, vous pouvez fermer le formulaire
     closeTicketForm();
 });
+
+// Ouvrir le formulaire de connexion
+function openLoginForm() {
+    var modal = document.getElementById('loginModal');
+    modal.style.display = 'block';
+}
+
+// Fermer le formulaire de connexion
+function closeLoginForm() {
+    var modal = document.getElementById('loginModal');
+    modal.style.display = 'none';
+}

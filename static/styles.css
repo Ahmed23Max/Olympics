@@ -63,6 +63,7 @@ footer {
     text-align: center;
     padding: 20px 0;
 }
+
 /* Style pour le pop-up modal */
 .modal {
     display: none; /* Par défaut, le pop-up est caché */
@@ -108,7 +109,6 @@ footer {
         overflow: auto;
     }
 }
-
 
 /* Ajout d'un style pour l'image de fond */
 .background-image {
@@ -173,6 +173,7 @@ footer {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ajoute une ombre légère à l'image */
     margin-top: 20px; /* Ajoute un espace en haut de l'image */
 }
+
 /* Styles pour la section des informations pratiques */
 .practical-info {
     padding: 50px 0; /* Ajoute de l'espace autour du contenu */
@@ -196,23 +197,46 @@ footer {
     color: #666; /* Couleur du texte */
 }
 
-        /* Custom CSS for hamburger menu and logo positioning */
-.navbar-brand img {
-            max-height: 40px;
-}
-
+/* Custom CSS for hamburger menu and logo positioning */
+.navbar-brand img,
 .navbar-toggler {
-            border: none;
-            padding: 0;
+    border: none;
+    padding: 0;
 }
 
 .navbar-toggler-icon {
-            background-image: url('path_to_hamburger_icon.png'); /* Replace 'path_to_hamburger_icon.png' with the path to your hamburger icon image */
-            width: 40px; /* Adjust as needed */
-            height: 40px; /* Adjust as needed */
-            background-size: contain;
+    background-image: url('path_to_hamburger_icon.png'); /* Replace 'path_to_hamburger_icon.png' with the path to your hamburger icon image */
+    width: 40px; /* Adjust as needed */
+    height: 40px; /* Adjust as needed */
+    background-size: contain;
 }
 
 .navbar-toggler:focus {
-            outline: none;
+    outline: none;
+}
+
+/* Additional padding for content */
+.content-padding {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+/* Custom CSS for hamburger menu and logo positioning */
+.navbar-brand img {
+    max-height: 40px;
+}
+
+.navbar-toggler {
+    border: none;
+    padding: 0;
+}
+
+.navbar-toggler-icon {
+    background-image: url('path_to_hamburger_icon.png'); /* Replace 'path_to_hamburger_icon.png' with the path to your hamburger icon image */
+    width: 40px; /* Adjust as needed */
+    height: 40px; /* Adjust as needed */
+    background-size: contain;
+}
+
+.navbar-toggler:focus {
+    outline: none;
 }

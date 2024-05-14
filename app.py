@@ -1,7 +1,40 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, Length
+from flask_bcrypt import Bcrypt
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '4249E775DF4E1E51A94FC83A1FB55'  # Clé secrète pour la sécurité des sessions
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://olympics_ngoj_user:XNB6TMo4a5VbkQ5X4DSgu1w03h63eP9F@dpg-cp1p3p8l5elc73f2gat0-a/olympics_ngoj'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Option recommandée pour améliorer les performances
 
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+
+# Modèle de données pour les utilisateurs
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+
+# Formulaire d'inscription
+class RegistrationForm(FlaskForm):
+    username = StringField('Nom d\'utilisateur', validators=[DataRequired(), Length(min=4, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirmer le mot de passe', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('S\'inscrire')
+
+# Formulaire de connexion
+class LoginForm(FlaskForm):
+    username = StringField('Nom d\'utilisateur', validators=[DataRequired()])
+    password = PasswordField('Mot de passe', validators=[DataRequired()])
+    submit = SubmitField('Se connecter')
+
+# Routes
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -67,7 +100,6 @@ def discipline_details(discipline_id):
     discipline = disciplines[discipline_id]
     return render_template('discipline_details.html', discipline=discipline)
 
-
 @app.route('/practical-info')
 def practical_info():
     return render_template('practical-info.html')
@@ -75,6 +107,34 @@ def practical_info():
 @app.route('/sitemap')
 def sitemap():
     return render_template('sitemap.html')
+
+# Route pour le formulaire d'inscription
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        # Sauvegarde des détails de l'utilisateur dans la base de données
+        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Votre compte a été créé avec succès !', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Inscription', form=form)
+
+# Route pour le formulaire de connexion
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        # Récupérer l'utilisateur depuis la base de données en fonction du nom d'utilisateur
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            # Connexion réussie
+            return redirect(url_for('index'))
+        else:
+            flash('Échec de la connexion. Veuillez vérifier votre nom d\'utilisateur et votre mot de passe.', 'danger')
+    return render_template('login.html', title='Connexion', form=form)
 
 @app.route('/tickets', methods=['GET', 'POST'])
 def tickets():
@@ -93,6 +153,11 @@ def ticket_confirmation(ticket_type):
 @app.route('/user-space')
 def user_space():
     return render_template('user-space.html')
+
+@app.route('/forgot_password')
+def forgot_password():
+    # Votre logique pour la réinitialisation du mot de passe
+    return render_template('forgot_password.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
