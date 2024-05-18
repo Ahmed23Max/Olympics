@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+{% block title %}Profil{% endblock %}
+{% block content %}
+<div class="container mt-4 profile-page">
+    <h1 class="welcome">Bienvenue, {{ user_name }}!</h1>
+
+    <div>
+        <div>
+            <h2>Votre Profil</h2>
+            <!-- Afficher les informations du profil de l'utilisateur -->
+            <ul>
+                <li><strong>Nom d'utilisateur :</strong> {{ user_name }}</li>
+                <li><strong>Email :</strong> {{ user_email }}</li>
+                <li>
+                    <strong>Date de Naissance :</strong> <span id="dateOfBirth">{{ user_date_of_birth or "Non fournie" }}</span>
+                </li>
+                <li>
+                    <strong>Localisation :</strong> <span id="location">{{ user_location or "Non fournie" }}</span>
+                </li>
+                <li>
+                    <strong>Numéro de Téléphone :</strong> <span id="phoneNumber">{{ user_phone_number or "Non fourni" }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bouton Modifier -->
+    <button id="editProfileButton" class="btn btn-primary mt-3">Modifier</button>
+
+    <div id="editForm" style="display: none;">
+        <h2 class="mt-4">Mettre à Jour Votre Profil</h2>
+        <form id="profileForm" action="/update_profile" method="POST">
+            <div class="form-group">
+                <label for="date_of_birth">Date de Naissance :</label>
+                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="{{ user_date_of_birth }}">
+            </div>
+            <div class="form-group">
+                <label for="location">Localisation (Pays) :</label>
+                <select id="country" name="location" class="form-control">
+                    {% for country, flag in countries_with_flags.items() %}
+                        <option value="{{ country }}" {% if user_location == country %}selected{% endif %}>{{ flag }} {{ country }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Numéro de Téléphone :</label>
+                <input type="text" id="phone_number" name="phone_number" class="form-control" value="{{ user_phone_number }}">
+            </div>
+            <!-- Ajouter un bouton de soumission pour envoyer le formulaire -->
+            <button type="submit" id="saveChangesButton" class="btn btn-primary">Enregistrer les Modifications</button>
+            <button type="button" id="cancelEditButton" class="btn btn-secondary">Annuler</button>
+        </form>
+    </div>
+</div>
+
+<script src="static/app.js"></script>
+{% endblock %}

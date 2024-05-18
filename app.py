@@ -1,41 +1,185 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
-from flask_bcrypt import Bcrypt
-from flask_sqlalchemy import SQLAlchemy
-from flask import session, redirect, url_for
-from flask import flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+import psycopg2
+import psycopg2.extras
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
+
+
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '4249E775DF4E1E51A94FC83A1FB55'  # Clé secrète pour la sécurité des sessions
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://olympics_ngoj_user:XNB6TMo4a5VbkQ5X4DSgu1w03h63eP9F@dpg-cp1p3p8l5elc73f2gat0-a.frankfurt-postgres.render.com/olympics_ngoj'
+app.secret_key = 'In9$]~3raxeG%L"7toNZwnuS:0D$?aq%{8+^R}(~<Xh3*P}.nmB4|fixQVwQ]:B'  # Clé secrète pour la sécurité des sessions
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Option recommandée pour améliorer les performances
+active_sessions = {}
 
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
+# Your database configuration
+db_config = {
+    'dbname': 'olympics_ngoj',
+    'user': 'olympics_ngoj_user',
+    'password': 'XNB6TMo4a5VbkQ5X4DSgu1w03h63eP9F',
+    'host': 'dpg-cp1p3p8l5elc73f2gat0-a.frankfurt-postgres.render.com'
+}
 
-# Modèle de données pour les utilisateurs
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
 
-# Formulaire d'inscription
-class RegistrationForm(FlaskForm):
-    username = StringField('Nom d\'utilisateur', validators=[DataRequired(), Length(min=4, max=20)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Confirmer le mot de passe', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('S\'inscrire')
+# Route de connexion
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
 
-# Formulaire de connexion
-class LoginForm(FlaskForm):
-    username = StringField('Nom d\'utilisateur', validators=[DataRequired()])
-    password = PasswordField('Mot de passe', validators=[DataRequired()])
-    submit = SubmitField('Se connecter')
+        try:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT id, username, password, email FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+
+            if user and check_password_hash(user[2], password):
+                # Générer un identifiant de session unique
+                session_id = str(uuid.uuid4())
+
+                # Stocker les données de l'utilisateur dans le dictionnaire active_sessions
+                active_sessions[session_id] = {
+                    'user_id': user[0],
+                    'user_name': user[1],
+                    'user_email': user[3]  # Définir l'email de l'utilisateur dans la session
+                }
+
+                # Stocker l'identifiant, le nom et l'email de l'utilisateur dans la session
+                session['user_id'] = user[0]
+                session['user_name'] = user[1]
+                session['user_email'] = user[3]  # Définir l'email de l'utilisateur dans la session
+
+                # Définir l'identifiant de session en tant que cookie
+                response = jsonify({"message": "Connexion réussie!"})
+                response.set_cookie('session_id', session_id)
+                return response
+            else:
+                return jsonify({"message": "Échec de la connexion. Veuillez vérifier vos informations d'identification."}), 401
+        except psycopg2.Error as e:
+            return jsonify({"message": "Une erreur s'est produite. Veuillez réessayer."}), 500
+        finally:
+            conn.close()
+
+# Route d'inscription
+@app.route('/signup', methods=['POST'])
+def signup():
+    if request.method == 'POST':
+        data = request.get_json()
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+
+        # Hacher le mot de passe avant de le stocker dans la base de données
+        hashed_password = generate_password_hash(password, method='sha256')
+
+        try:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            cursor.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)",
+                           (username, email, hashed_password))
+
+            conn.commit()
+            return jsonify({"message": "Inscription réussie! Vous pouvez maintenant vous connecter."}), 200
+        except psycopg2.Error as e:
+            conn.rollback()
+            return jsonify({"message": "L'inscription a échoué. Veuillez réessayer."}), 400
+        finally:
+            conn.close()
+
+
+@app.route('/logout')
+def logout():
+    session_id = request.cookies.get('session_id')
+    if session_id:
+        # Supprimer les données de session du dictionnaire active_sessions
+        active_sessions.pop(session_id, None)
+
+        # Effacer les données de session
+        session.clear()
+
+    flash('Vous avez été déconnecté.', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/profile')
+def profile():
+    if 'user_id' in session and 'user_name' in session:
+        user_id = session['user_id']
+
+        try:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            # Récupérer les données de profil de l'utilisateur dans la base de données
+            cursor.execute("SELECT username, email, date_of_birth, location, phone_number FROM users WHERE id = %s", (user_id,))
+            user_data = cursor.fetchone()
+            
+            if user_data:
+                user_name = user_data[0]
+                user_email = user_data[1]
+                user_date_of_birth = user_data[2] or 'Non fourni'
+                user_location = user_data[3] or 'Non fourni'
+                user_phone_number = user_data[4] or 'Non fourni'
+            else:
+                # Gérer le cas où user_data est None
+                user_name = session['user_name']
+                user_email = session.get('user_email', 'Non fourni')
+                user_date_of_birth = session.get('user_date_of_birth', 'Non fourni')
+                user_location = session.get('user_location', 'Non fourni')
+                user_phone_number = session.get('user_phone_number', 'Non fourni')
+
+            return render_template('profile.html', user_name=user_name, user_email=user_email,
+                                   user_date_of_birth=user_date_of_birth, user_location=user_location,
+                                   user_phone_number=user_phone_number, countries_with_flags=countries_with_flags)
+        except psycopg2.Error as e:
+            flash('Une erreur s\'est produite lors de la récupération de votre profil. Veuillez réessayer.', 'danger')
+            return redirect(url_for('login'))
+        finally:
+            conn.close()
+    else:
+        return redirect(url_for('login'))
+    
+    
+
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    if 'user_id' in session and 'user_name' in session:
+        user_id = session['user_id']
+        
+        # Obtenir les informations de profil à partir des données soumises du formulaire
+        date_of_birth = request.form.get('date_of_birth')
+        location = request.form.get('location')
+        phone_number = request.form.get('phone_number')
+
+        try:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            # Mettre à jour le profil de l'utilisateur dans la base de données
+            cursor.execute("UPDATE users SET date_of_birth = %s, location = %s, phone_number = %s WHERE id = %s",
+                           (date_of_birth, location, phone_number, user_id))
+
+            conn.commit()
+
+            # Mettre à jour les variables de session avec les nouvelles informations de profil
+            session['user_date_of_birth'] = date_of_birth
+            session['user_location'] = location
+            session['user_phone_number'] = phone_number
+
+            flash('Profil mis à jour avec succès!', 'success')
+            return redirect(url_for('profile'))
+        except psycopg2.Error as e:
+            conn.rollback()
+            flash('Échec de la mise à jour du profil. Veuillez réessayer.', 'danger')
+            return redirect(url_for('profile'))
+        finally:
+            conn.close()
+    else:
+        return redirect(url_for('login'))
+
 
 # Routes
 @app.route('/')
@@ -111,39 +255,6 @@ def practical_info():
 def sitemap():
     return render_template('sitemap.html')
 
-# Route pour le formulaire d'inscription
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        # Sauvegarde des détails de l'utilisateur dans la base de données
-        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Votre compte a été créé avec succès !', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Inscription', form=form)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        # Récupérer l'utilisateur depuis la base de données en fonction du nom d'utilisateur
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            # Vérifier si le mot de passe est correct
-            if bcrypt.check_password_hash(user.password, form.password.data):
-                # Connexion réussie
-                session['username'] = user.username  # Ajoutez le nom d'utilisateur à la session
-                flash('Connexion réussie !', 'success')
-                return redirect(url_for('index'))  # Redirige vers la page d'accueil
-            else:
-                flash('Échec de la connexion. Veuillez vérifier votre nom d\'utilisateur et votre mot de passe.', 'danger')
-        else:
-            flash('Échec de la connexion. Nom d\'utilisateur incorrect.', 'danger')
-    return render_template('login.html', title='Connexion', form=form)
-
 @app.route('/tickets', methods=['GET', 'POST'])
 def tickets():
     if request.method == 'POST':
@@ -158,30 +269,158 @@ def ticket_confirmation(ticket_type):
     # Vous pouvez utiliser le type de billet ici pour afficher une confirmation personnalisée
     return render_template('ticket_confirmation.html', ticket_type=ticket_type)
 
-@app.route('/user-space')
-def user_space():
-    if 'username' in session:
-        # Si l'utilisateur est connecté, récupérez ses informations à partir de la session
-        username = session['username']
-        # Recherchez l'utilisateur dans la base de données en fonction du nom d'utilisateur
-        user = User.query.filter_by(username=username).first()
-        # Passez les informations de l'utilisateur au modèle user-space.html
-        return render_template('user-space.html', user=user)
-    else:
-        # Si l'utilisateur n'est pas connecté, redirigez-le vers la page de connexion
-        return redirect(url_for('login'))
+
 
 @app.route('/forgot_password')
 def forgot_password():
     # Votre logique pour la réinitialisation du mot de passe
     return render_template('forgot_password.html')
 
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    flash('Vous avez été déconnecté avec succès.', 'success')
-    return redirect(url_for('index'))
-
+# Add 27 more countries with flags to the dictionary
+countries_with_flags = {
+    "Albania": "🇦🇱",
+    "Algeria": "🇩🇿",
+    "Argentina": "🇦🇷",
+    "Armenia": "🇦🇲",
+    "Australia": "🇦🇺",
+    "Bahamas": "🇧🇸",
+    "Bahrain": "🇧🇭",
+    "Bangladesh": "🇧🇩",
+    "Barbados": "🇧🇧",
+    "Belarus": "🇧🇾",
+    "Belize": "🇧🇿",
+    "Benin": "🇧🇯",
+    "Bhutan": "🇧🇹",
+    "Bolivia": "🇧🇴",
+    "Brazil": "🇧🇷",
+    "Brunei": "🇧🇳",
+    "Bulgaria": "🇧🇬",
+    "Cambodia": "🇰🇭",
+    "Canada": "🇨🇦",
+    "Cabo Verde": "🇨🇻",
+    "Cameroon": "🇨🇲",
+    "Chad": "🇹🇩",
+    "Chile": "🇨🇱",
+    "China": "🇨🇳",
+    "Colombia": "🇨🇴",
+    "Comoros": "🇰🇲",
+    "Croatia": "🇭🇷",
+    "Cyprus": "🇨🇾",
+    "Côte d'Ivoire": "🇨🇮",
+    "Djibouti": "🇩🇯",
+    "Dominican Republic": "🇩🇴",
+    "DR Congo": "🇨🇩",
+    "Ecuador": "🇪🇨",
+    "Egypt": "🇪🇬",
+    "El Salvador": "🇸🇻",
+    "Eritrea": "🇪🇷",
+    "Estonia": "🇪🇪",
+    "Eswatini": "🇸🇿",
+    "Ethiopia": "🇪🇹",
+    "Fiji": "🇫🇯",
+    "Finland": "🇫🇮",
+    "France": "🇫🇷",
+    "Gambia": "🇬🇲",
+    "Georgia": "🇬🇪",
+    "Germany": "🇩🇪",
+    "Ghana": "🇬🇭",
+    "Grenada": "🇬🇩",
+    "Guinea": "🇬🇳",
+    "Guyana": "🇬🇾",
+    "Haiti": "🇭🇹",
+    "Honduras": "🇭🇳",
+    "Hungary": "🇭🇺",
+    "Iceland": "🇮🇸",
+    "India": "🇮🇳",
+    "Indonesia": "🇮🇩",
+    "Iran": "🇮🇷",
+    "Iraq": "🇮🇶",
+    "Italy": "🇮🇹",
+    "Jamaica": "🇯🇲",
+    "Japan": "🇯🇵",
+    "Jordan": "🇯🇴",
+    "Kazakhstan": "🇰🇿",
+    "Kenya": "🇰🇪",
+    "Kuwait": "🇰🇼",
+    "Kyrgyzstan": "🇰🇬",
+    "Lao PDR": "🇱🇦",
+    "Latvia": "🇱🇻",
+    "Lebanon": "🇱🇧",
+    "Liberia": "🇱🇷",
+    "Libya": "🇱🇾",
+    "Lithuania": "🇱🇹",
+    "Luxembourg": "🇱🇺",
+    "Macau": "🇲🇴",
+    "Madagascar": "🇲🇬",
+    "Malawi": "🇲🇼",
+    "Maldives": "🇲🇻",
+    "Mali": "🇲🇱",
+    "Malta": "🇲🇹",
+    "Mauritania": "🇲🇷",
+    "Mauritius": "🇲🇺",
+    "Mexico": "🇲🇽",
+    "Moldova": "🇲🇩",
+    "Mozambique": "🇲🇿",
+    "Myanmar": "🇲🇲",
+    "Namibia": "🇳🇦",
+    "Nepal": "🇳🇵",
+    "Netherlands": "🇳🇱",
+    "New Zealand": "🇳🇿",
+    "Nicaragua": "🇳🇮",
+    "Niger": "🇳🇪",
+    "Nigeria": "🇳🇬",
+    "North Korea": "🇰🇵",
+    "Norway": "🇳🇴",
+    "Oman": "🇴🇲",
+    "Pakistan": "🇵🇰",
+    "Palestine": "🇵🇸",
+    "Panama": "🇵🇦",
+    "Peru": "🇵🇪",
+    "Philippines": "🇵🇭",
+    "Poland": "🇵🇱",
+    "Portugal": "🇵🇹",
+    "Qatar": "🇶🇦",
+    "Rwanda": "🇷🇼",
+    "Saint Lucia": "🇱🇨",
+    "Saint Vincent and the Grenadines": "🇻🇨",
+    "Samoa": "🇼🇸",
+    "Saudi Arabia": "🇸🇦",
+    "Senegal": "🇸🇳",
+    "Sierra Leone": "🇸🇱",
+    "Singapore": "🇸🇬",
+    "Slovakia": "🇸🇰",
+    "Slovenia": "🇸🇮",
+    "Solomon Islands": "🇸🇧",
+    "Somalia": "🇸🇴",
+    "South Africa": "🇿🇦",
+    "South Korea": "🇰🇷",
+    "Spain": "🇪🇸",
+    "Sri Lanka": "🇱🇰",
+    "Sudan": "🇸🇩",
+    "Suriname": "🇸🇷",
+    "Sweden": "🇸🇪",
+    "Switzerland": "🇨🇭",
+    "Syria": "🇸🇾",
+    "Taiwan": "🇹🇼",
+    "Tajikistan": "🇹🇯",
+    "Tanzania": "🇹🇿",
+    "Timor-Leste": "🇹🇱",
+    "Trinidad and Tobago": "🇹🇹",
+    "Tunisia": "🇹🇳",
+    "Turkey": "🇹🇷",
+    "Uganda": "🇺🇬",
+    "Ukraine": "🇺🇦",
+    "United Arab Emirates": "🇦🇪",
+    "United Kingdom": "🇬🇧",
+    "United States": "🇺🇸",
+    "Uruguay": "🇺🇾",
+    "Uzbekistan": "🇺🇿",
+    "Vanuatu": "🇻🇺",
+    "Venezuela": "🇻🇪",
+    "Vietnam": "🇻🇳",
+    "Yemen": "🇾🇪",
+    "Zimbabwe": "🇿🇼",
+}
 
 if __name__ == '__main__':
     app.run(debug=True)
