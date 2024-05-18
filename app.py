@@ -7,7 +7,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '4249E775DF4E1E51A94FC83A1FB55'  # Clé secrète pour la sécurité des sessions
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://olympics_ngoj_user:XNB6TMo4a5VbkQ5X4DSgu1w03h63eP9F@dpg-cp1p3p8l5elc73f2gat0-a/olympics_ngoj'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://olympics_ngoj_user:XNB6TMo4a5VbkQ5X4DSgu1w03h63eP9F@dpg-cp1p3p8l5elc73f2gat0-a.frankfurt-postgres.render.com/olympics_ngoj'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Option recommandée pour améliorer les performances
 
 db = SQLAlchemy(app)
