@@ -65,4 +65,9 @@ function openLoginForm() {
 function closeLoginForm() {
     var modal = document.getElementById('loginModal');
     modal.style.display = 'none';
-}
+}// Initialiser les composants Bootstrap
+
+$(document).ready(function() {
+    // Initialiser le dropdown
+    $('.dropdown-toggle').dropdown();
+});

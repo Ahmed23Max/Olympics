@@ -4,6 +4,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+from flask import session, redirect, url_for
+from flask import flash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '4249E775DF4E1E51A94FC83A1FB55'  # Clé secrète pour la sécurité des sessions
@@ -123,18 +125,23 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Inscription', form=form)
 
-# Route pour le formulaire de connexion
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         # Récupérer l'utilisateur depuis la base de données en fonction du nom d'utilisateur
         user = User.query.filter_by(username=form.username.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            # Connexion réussie
-            return redirect(url_for('index'))
+        if user:
+            # Vérifier si le mot de passe est correct
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                # Connexion réussie
+                session['username'] = user.username  # Ajoutez le nom d'utilisateur à la session
+                flash('Connexion réussie !', 'success')
+                return redirect(url_for('index'))  # Redirige vers la page d'accueil
+            else:
+                flash('Échec de la connexion. Veuillez vérifier votre nom d\'utilisateur et votre mot de passe.', 'danger')
         else:
-            flash('Échec de la connexion. Veuillez vérifier votre nom d\'utilisateur et votre mot de passe.', 'danger')
+            flash('Échec de la connexion. Nom d\'utilisateur incorrect.', 'danger')
     return render_template('login.html', title='Connexion', form=form)
 
 @app.route('/tickets', methods=['GET', 'POST'])
@@ -153,12 +160,28 @@ def ticket_confirmation(ticket_type):
 
 @app.route('/user-space')
 def user_space():
-    return render_template('user-space.html')
+    if 'username' in session:
+        # Si l'utilisateur est connecté, récupérez ses informations à partir de la session
+        username = session['username']
+        # Recherchez l'utilisateur dans la base de données en fonction du nom d'utilisateur
+        user = User.query.filter_by(username=username).first()
+        # Passez les informations de l'utilisateur au modèle user-space.html
+        return render_template('user-space.html', user=user)
+    else:
+        # Si l'utilisateur n'est pas connecté, redirigez-le vers la page de connexion
+        return redirect(url_for('login'))
 
 @app.route('/forgot_password')
 def forgot_password():
     # Votre logique pour la réinitialisation du mot de passe
     return render_template('forgot_password.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('Vous avez été déconnecté avec succès.', 'success')
+    return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

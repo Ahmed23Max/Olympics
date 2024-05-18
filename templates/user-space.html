@@ -7,6 +7,11 @@
 {% block content %}
 <section class="user-space">
     <h2>Espace Utilisateur</h2>
-    <!-- Insérer ici un formulaire d'inscription et un tableau de bord personnalisé -->
+    {% if user %}
+        <p>Nom d'utilisateur : {{ user.username }}</p>
+        <p>Email : {{ user.email }}</p>
+    {% else %}
+        <p>Aucune information sur l'utilisateur.</p>
+    {% endif %}
 </section>
 {% endblock %}

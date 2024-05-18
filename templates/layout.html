@@ -30,9 +30,20 @@
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('tickets') }}">Billets</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('sitemap') }}">Plan du site</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('practical_info') }}">Infos pratiques</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('user_space') }}">Espace utilisateur</a></li>
-                        <!-- Bouton de connexion -->
-                        <li class="nav-item"><a class="nav-link" href="#" onclick="openLoginForm()">Connexion</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Espace utilisateur
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                {% if 'username' in session %}
+                                <span class="dropdown-item">Bonjour, {{ session['username'] }}</span>
+                                <a class="dropdown-item" href="{{ url_for('logout') }}">Déconnexion</a>
+                                {% else %}
+                                <a class="dropdown-item" href="#" onclick="openLoginForm()">Connexion</a>
+                                <a class="dropdown-item" href="{{ url_for('register') }}">S'inscrire</a>
+                                {% endif %}
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -73,10 +84,12 @@
         </div>
     </footer>
 
-    <!-- Include Bootstrap JS (optional) -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Link your custom JavaScript file -->
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+   <!-- Include Bootstrap JS (jQuery, Popper.js, Bootstrap JS) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<!-- Link your custom JavaScript file -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
