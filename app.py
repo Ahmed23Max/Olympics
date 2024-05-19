@@ -11,6 +11,9 @@ app.secret_key = SECRET_KEY
 
 active_sessions = {}
 
+
+unique_key = uuid.uuid4().hex
+
 # Route de connexion
 @app.route('/login', methods=['POST'])
 def login():
@@ -195,9 +198,19 @@ def practical_info():
 def sitemap():
     return render_template('sitemap.html')
 
+# Route pour afficher la page des billets
 @app.route('/tickets')
 def tickets():
     return render_template('ticket.html')
+
+# Route pour vérifier l'état de connexion
+@app.route('/check_login_status')
+def check_login_status():
+    if 'user_id' in session:
+        return jsonify({'logged_in': True})
+    else:
+        return jsonify({'logged_in': False})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
