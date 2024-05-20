@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Panier d'achat - Jeux Olympiques 2024
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Panier d'achat</h1>
+    <ul>
+        {% for event, tickets in cart.items() %}
+        <li>{{ event }} - {{ tickets }} billets</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('checkout') }}" class="btn btn-primary">Passer à la caisse</a>
+</div>
+{% endblock %}
