@@ -50,73 +50,72 @@
             </nav>
         </div>
         <!-- Créer la modal en cascade -->
-<div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="accountModalLabel">Compte</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <!-- Contenu de la modal en cascade -->
-                <div class="form-checkout">
-                    <!-- Retirer la classe "card" -->
-                    <button id="login-button" class="btn btn-login">Connexion</button>
-                    <button id="signup-button" class="btn btn-signup">S'inscrire</button>
-                </div>
-                <div id="login-form" class="form-box">
-                    <h2>Connexion</h2>
-                    <form id="login-form">
-                        <div class="form-group">
-                            <label for="login-username">Nom d'utilisateur :</label>
-                            <input type="text" id="login-username" class="form-control" placeholder="Nom d'utilisateur" required>
+        <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="accountModalLabel">Compte</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="form-checkout">
+                            <button id="login-button" class="btn btn-login">Connexion</button>
+                            <button id="signup-button" class="btn btn-signup">S'inscrire</button>
                         </div>
-                        <div class="form-group">
-                            <label for="login-password">Mot de passe :</label>
-                            <div class="input-group">
-                                <input type="password" id="login-password" class="form-control" placeholder="Mot de passe" required>
-                                <div class="input-group-append">
-                                    <button class="btn btn-toggle-password" type="button"><i class="bi bi-eye-slash"></i></button>
+                        <div id="login-form" class="form-box" style="display: block;">
+                            <h2>Connexion</h2>
+                            <form>
+                                <div class="form-group">
+                                    <label for="login-username">Nom d'utilisateur :</label>
+                                    <input type="text" id="login-username" class="form-control" placeholder="Nom d'utilisateur" required>
                                 </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary" id="login">Connexion</button>
-                    </form>
-                </div>
-                <div id="signup-form" class="form-box">
-                    <h2>S'inscrire</h2>
-                    <form id="signup-form">
-                        <div class="form-group">
-                            <label for="signup-username">Nom d'utilisateur :</label>
-                            <input type="text" id="signup-username" class="form-control" placeholder="Nom d'utilisateur" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-email">Email :</label>
-                            <input type="email" id="signup-email" class="form-control" placeholder="Email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-password">Mot de passe :</label>
-                            <div class="input-group">
-                                <input type="password" id="signup-password" class="form-control" placeholder="Mot de passe" required>
-                                <div class="input-group-append">
-                                    <button class="btn btn-toggle-password" type="button"><i class="bi bi-eye-slash"></i></button>
+                                <div class="form-group">
+                                    <label for="login-password">Mot de passe :</label>
+                                    <div class="input-group">
+                                        <input type="password" id="login-password" class="form-control" placeholder="Mot de passe" required>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-toggle-password" type="button"><i class="bi bi-eye-slash"></i></button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                <button type="submit" class="btn btn-primary" id="login">Connexion</button>
+                            </form>
                         </div>
-                        <div class="form-group">
-                            <label for="signup-confirm-password">Confirmer le mot de passe :</label>
-                            <input type="password" id="signup-confirm-password" class="form-control" placeholder="Confirmer le mot de passe" required>
+                        <div id="signup-form" class="form-box" style="display: none;">
+                            <h2>S'inscrire</h2>
+                            <form>
+                                <div class="form-group">
+                                    <label for="signup-username">Nom d'utilisateur :</label>
+                                    <input type="text" id="signup-username" class="form-control" placeholder="Nom d'utilisateur" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="signup-email">Email :</label>
+                                    <input type="email" id="signup-email" class="form-control" placeholder="Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="signup-password">Mot de passe :</label>
+                                    <div class="input-group">
+                                        <input type="password" id="signup-password" class="form-control" placeholder="Mot de passe" required>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-toggle-password" type="button"><i class="bi bi-eye-slash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="signup-confirm-password">Confirmer le mot de passe :</label>
+                                    <input type="password" id="signup-confirm-password" class="form-control" placeholder="Confirmer le mot de passe" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary" id="sign-up">S'inscrire</button>
+                            </form>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="sign-up">S'inscrire</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+        
 
     </header>
     {% block content %}
@@ -133,6 +132,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <!-- Link your custom JavaScript file -->
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 <script src="{{ url_for('static', filename='users.js') }}"></script>

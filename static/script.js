@@ -1,112 +1,117 @@
-// JavaScript pour basculer entre l'affichage du profil et du formulaire de modification
 document.addEventListener("DOMContentLoaded", function () {
-    const boutonEditerProfil = document.getElementById("editProfile");
-    const boutonAnnulerModif = document.getElementById("cancelEdit");
-    const boutonEnregistrerModif = document.getElementById("saveChanges");
-    const formulaireProfil = document.getElementById("profileForm");
-    const champDateNaissance = document.getElementById("date_of_birth");
-    const selectPays = document.getElementById("country");
-    const champNumeroTelephone = document.getElementById("phone_number");
+    const loginButton = document.getElementById('login-button');
+    const signupButton = document.getElementById('signup-button');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const togglePasswordButtons = document.querySelectorAll('.btn-toggle-password');
 
-    // Ajouter 27 pays supplémentaires avec leurs régions téléphoniques respectives
-    const paysVersRegionTelephone = {
-        "USA": "+1",
-        "Canada": "+1",
-        "Royaume-Uni": "+44",
-        "Allemagne": "+49",
-        "France": "+33",
-        "Australie": "+61",
-        "Japon": "+81",
-        "Inde": "+91",
-        "Brésil": "+55",
-        "Mexique": "+52",
-        "Chine": "+86",
-        "Russie": "+7",
-        "Corée du Sud": "+82",
-        "Italie": "+39",
-        "Espagne": "+34",
-        "Pays-Bas": "+31",
-        "Suède": "+46",
-        "Norvège": "+47",
-        "Danemark": "+45",
-        "Finlande": "+358",
-        "Suisse": "+41",
-        "Autriche": "+43",
-        "Belgique": "+32",
-        "Grèce": "+30",
-        "Portugal": "+351",
-        "Irlande": "+353",
-        "Nouvelle-Zélande": "+64",
-    };
+    // Par défaut, afficher le formulaire de connexion et masquer le formulaire d'inscription
+    loginForm.style.display = 'block';
+    signupForm.style.display = 'none';
 
-    boutonEditerProfil.addEventListener("click", function () {
-        basculerFormulaireEdition();
+    // Écouteur d'événements pour le bouton de connexion
+    loginButton.addEventListener('click', () => {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
     });
 
-    boutonAnnulerModif.addEventListener("click", function () {
-        basculerFormulaireEdition();
+    // Écouteur d'événements pour le bouton d'inscription
+    signupButton.addEventListener('click', () => {
+        signupForm.style.display = 'block';
+        loginForm.style.display = 'none';
     });
 
-    boutonEnregistrerModif.addEventListener("click", function () {
-        // Sérialiser les données du formulaire en un objet JSON
-        const donneesFormulaire = new FormData(formulaireProfil);
-        const donnees = {};
-        donneesFormulaire.forEach((value, key) => {
-            donnees[key] = value;
+    // Fonction pour basculer la visibilité du mot de passe
+    function togglePasswordVisibility(inputElement, toggleButton) {
+        const passwordInput = inputElement;
+        const eyeIcon = toggleButton.querySelector('i');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('bi-eye-slash');
+            eyeIcon.classList.add('bi-eye');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('bi-eye');
+            eyeIcon.classList.add('bi-eye-slash');
+        }
+    }
+
+    // Écouteur d'événements pour les boutons "Afficher le mot de passe"
+    togglePasswordButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const passwordInput = button.parentElement.parentElement.querySelector('input[type="password"]');
+            togglePasswordVisibility(passwordInput, button);
         });
+    });
 
-        // Vérifier si la date de naissance sélectionnée remonte à au moins 18 ans
-        const dateNaissance = new Date(champDateNaissance.value);
-        const maintenant = new Date();
-        const age = maintenant.getFullYear() - dateNaissance.getFullYear();
-        if (age < 18) {
-            alert("Vous devez avoir au moins 18 ans pour mettre à jour votre profil.");
+    // Écouteur d'événements pour la soumission du formulaire d'inscription
+    signupForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const signupUsername = document.getElementById('signup-username').value;
+        const signupEmail = document.getElementById('signup-email').value;
+        const signupPassword = document.getElementById('signup-password').value;
+        const signupConfirmPassword = document.getElementById('signup-confirm-password').value;
+
+        if (signupPassword !== signupConfirmPassword) {
+            alert('Le mot de passe et la confirmation du mot de passe doivent correspondre.');
             return;
         }
 
-        // Envoyer une requête AJAX pour mettre à jour les données du profil
-        fetch("/mettre_a_jour_profil", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(donnees),
-        })
-            .then((response) => response.json())
-            .then((resultat) => {
-                if (resultat.message === "Profil mis à jour avec succès !") {
-                    // Profil mis à jour avec succès, basculer le formulaire
-                    basculerFormulaireEdition();
-                } else {
-                    // Gérer les erreurs ou afficher un message à l'utilisateur
-                    console.error("Échec de la mise à jour du profil:", resultat.message);
-                }
-            })
-            .catch((erreur) => {
-                console.error("Une erreur s'est produite:", erreur);
+        try {
+            const response = await fetch("/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: signupUsername,
+                    email: signupEmail,
+                    password: signupPassword,
+                }),
             });
-    });
 
-    // Mettre à jour la région téléphonique en fonction du pays sélectionné
-    selectPays.addEventListener("change", function () {
-        const paysSelectionne = selectPays.value;
-        const regionTelephone = paysVersRegionTelephone[paysSelectionne] || "";
-        champNumeroTelephone.value = regionTelephone;
-    });
-
-    function basculerFormulaireEdition() {
-        const carte = document.querySelector(".card");
-        const formulaireEdition = document.getElementById("editForm");
-        const boutonsEdition = document.getElementById("editButtons");
-
-        if (carte.style.display === "none" || carte.style.display === "") {
-            carte.style.display = "block";
-            formulaireEdition.style.display = "none";
-            boutonsEdition.style.display = "none";
-        } else {
-            carte.style.display = "none";
-            formulaireEdition.style.display = "block";
-            boutonsEdition.style.display = "block";
+            if (response.ok) {
+                alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                loginForm.style.display = 'block'; // Afficher le formulaire de connexion après une inscription réussie
+                signupForm.style.display = 'none'; // Masquer le formulaire d'inscription
+                // Optionnellement, vous pouvez effacer les champs du formulaire d'inscription ici
+            } else {
+                alert("L'inscription a échoué. Veuillez réessayer.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Une erreur s\'est produite. Veuillez réessayer.');
         }
-    }
+    });
+
+    // Écouteur d'événements pour la soumission du formulaire de connexion
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const loginUsername = document.getElementById('login-username').value;
+        const loginPassword = document.getElementById('login-password').value;
+
+        try {
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: loginUsername,
+                    password: loginPassword,
+                }),
+            });
+
+            if (response.ok) {
+                alert('Connexion réussie !');
+                // Recharger la page après une connexion réussie
+                window.location.reload();
+            } else {
+                alert('La connexion a échoué. Veuillez réessayer.');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Une erreur s\'est produite. Veuillez réessayer.');
+        }
+    });
 });

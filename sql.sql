@@ -30,3 +30,5 @@ VALUES ('Billet pour la cérémonie d''ouverture avec accès aux tribunes princi
 INSERT INTO Offres (type_billet, prix, nombre_billets_disponibles, date_debut_vente, date_fin_vente)
 VALUES ('Billet pour la visite guidée du village olympique pour les athlètes', 50.00, 300, '2024-07-20', '2024-08-05'),
        ('Billet pour la visite guidée du village olympique pour les spectateurs', 40.00, 500, '2024-07-20', '2024-08-05');
+
+       -=2)P^FGuLnJuk.

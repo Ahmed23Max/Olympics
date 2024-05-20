@@ -8,3 +8,5 @@ db_config = {
 
 # Clé secrète de l'application
 SECRET_KEY = 'In9$]~3raxeG%L"7toNZwnuS:0D$?aq%{8+^R}(~<Xh3*P}.nmB4|fixQVwQ]:B'
+
+

@@ -6,6 +6,7 @@ import uuid
 from config import db_config, SECRET_KEY
 from donne import disciplines, countries_with_flags
 
+
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
@@ -198,18 +199,10 @@ def practical_info():
 def sitemap():
     return render_template('sitemap.html')
 
-# Route pour afficher la page des billets
 @app.route('/tickets')
 def tickets():
-    return render_template('ticket.html')
-
-# Route pour vérifier l'état de connexion
-@app.route('/check_login_status')
-def check_login_status():
-    if 'user_id' in session:
-        return jsonify({'logged_in': True})
-    else:
-        return jsonify({'logged_in': False})
+    logged_in = 'user_id' in session
+    return render_template('ticket.html', logged_in=logged_in)
 
 
 if __name__ == '__main__':
