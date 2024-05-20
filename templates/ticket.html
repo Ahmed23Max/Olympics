@@ -7,20 +7,6 @@
 {% block content %}
 <div id="ticket-message">
     {% if logged_in %}
-        <h2>Offres de Billets</h2>
-        <ul>
-            {% for ticket_offer in ticket_offers %}
-                <li>
-                    <h3>{{ ticket_offer['type_billet'] }}</h3>
-                    <p>Prix : {{ ticket_offer['prix'] }} €</p>
-                    <p>Billets disponibles : {{ ticket_offer['nombre_billets_disponibles'] }}</p>
-                    <form action="/purchase_ticket" method="post">
-                        <input type="hidden" name="ticket_id" value="{{ ticket_offer['id'] }}">
-                        <button type="submit">Acheter</button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
     {% else %}
         <p>Pour acheter, veuillez vous connecter.</p>
     {% endif %}
