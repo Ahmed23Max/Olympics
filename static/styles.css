@@ -207,3 +207,16 @@ footer {
 }
 
 
+/* static/styles.css */
+.card {
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
