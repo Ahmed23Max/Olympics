@@ -76,8 +76,7 @@ def process_payment():
 
     ticket_id = request.form.get('ticket_id')
     quantity = int(request.form.get('quantity'))
-    payment_method = request.form.get('payment_method')
-    stripe_token = request.form.get('stripeToken') if payment_method == 'stripe' else None
+    stripe_token = request.form.get('stripeToken')
 
     try:
         conn = psycopg2.connect(**db_config)
@@ -85,40 +84,24 @@ def process_payment():
 
         cursor.execute("SELECT * FROM tickets WHERE id = %s", (ticket_id,))
         ticket = cursor.fetchone()
-        available_tickets = ticket['available_tickets']
-        price = ticket['price']
+        price_id = ticket['stripe_id']  # Récupérer l'ID de prix Stripe
+        price = stripe.Price.retrieve(price_id)  # Récupérer l'objet prix Stripe
 
-        if available_tickets >= quantity:
-            amount = int(price * 100 * quantity)  # Stripe requires the amount in cents
+        # Créer une session de paiement avec Stripe
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price': price.id,
+                    'quantity': quantity,
+                },
+            ],
+            mode='payment',
+            success_url=url_for('success', _external=True),
+            cancel_url=url_for('cancel', _external=True),
+        )
 
-            if payment_method == 'stripe':
-                # Create a charge using Stripe
-                charge = stripe.Charge.create(
-                    amount=amount,
-                    currency='eur',
-                    source=stripe_token,
-                    description=f"Achat de {quantity} billets pour {ticket['event_name']}"
-                )
-                charge_id = charge.id
-            else:
-                # Simulate a bank card payment process
-                charge_id = 'bank_card_payment'
-
-            # Insert the transaction into the database
-            cursor.execute(
-                "INSERT INTO transactions (user_id, ticket_id, quantity, stripe_charge_id) VALUES (%s, %s, %s, %s)",
-                (session['user_id'], ticket_id, quantity, charge_id)
-            )
-            # Update the number of available tickets
-            cursor.execute(
-                "UPDATE tickets SET available_tickets = available_tickets - %s WHERE id = %s",
-                (quantity, ticket_id)
-            )
-
-            conn.commit()
-            flash('Billet(s) acheté(s) avec succès!', 'success')
-        else:
-            flash('Quantité de billets insuffisante.', 'danger')
+        return redirect(session.url)  # Rediriger vers l'URL de paiement Stripe
     except stripe.error.StripeError as e:
         flash(f"Erreur Stripe: {str(e)}", 'danger')
     except psycopg2.Error as e:
@@ -128,6 +111,15 @@ def process_payment():
         if conn:
             conn.close()
         return redirect(url_for('tickets'))
+
+@app.route('/success')
+def success():
+    return render_template('success.html')
+
+@app.route('/cancel')
+def cancel():
+    return render_template('cancel.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -6,6 +6,9 @@ import uuid
 from donne import countries_with_flags
 from flask import current_app
 
+
+active_sessions = {}
+
 def login():
     if request.method == 'POST':
         data = request.get_json()
