@@ -1,12 +1,16 @@
+<!-- success.html -->
 {% extends 'layout.html' %}
 
 {% block title %}
-    Paiement réussi
+    Paiement réussi - Jeux Olympiques 2024
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>Paiement réussi</h1>
-        <p>Votre paiement a été effectué avec succès. Merci!</p>
+<div class="container mt-5">
+    <h1 class="text-center text-success">Paiement réussi !</h1>
+    <p class="text-center">Votre billet a été acheté avec succès.</p>
+    <div class="text-center">
+        <a href="{{ url_for('tickets') }}" class="btn btn-primary">Retour aux billets</a>
     </div>
+</div>
 {% endblock %}

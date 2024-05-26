@@ -1,18 +1,19 @@
-import stripe
-from flask import Flask, render_template, session, request, redirect, url_for, flash
+from flask import Flask, render_template, session, request, jsonify, flash, redirect, url_for
 from users import login, signup, logout, profile, update_profile
-from config import db_config, STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY
+from config import db_config, SECRET_KEY, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
 from donne import disciplines
-from config import SECRET_KEY
+import stripe
 import psycopg2
 import psycopg2.extras
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
-stripe.api_key = STRIPE_SECRET_KEY
 
 # Configuration de la base de données
 app.config['db_config'] = db_config
+
+# Configuration de Stripe
+stripe.api_key = STRIPE_SECRET_KEY
 
 # Route de connexion
 app.add_url_rule('/login', 'login', login, methods=['POST'])
@@ -60,57 +61,13 @@ def tickets():
         cursor.execute("SELECT * FROM tickets")
         tickets = cursor.fetchall()
         logged_in = 'user_id' in session
-        return render_template('ticket.html', tickets=tickets, logged_in=logged_in, stripe_public_key=STRIPE_PUBLIC_KEY)
+        return render_template('ticket.html', tickets=tickets, logged_in=logged_in, stripe_publishable_key=STRIPE_PUBLISHABLE_KEY)
     except psycopg2.Error as e:
         flash('Erreur lors de la récupération des billets.', 'danger')
         return render_template('ticket.html', tickets=[], logged_in='user_id' in session)
     finally:
         if conn:
             conn.close()
-
-@app.route('/process_payment', methods=['POST'])
-def process_payment():
-    if 'user_id' not in session:
-        flash('Veuillez vous connecter pour acheter un billet.', 'warning')
-        return redirect(url_for('login'))
-
-    ticket_id = request.form.get('ticket_id')
-    quantity = int(request.form.get('quantity'))
-    stripe_token = request.form.get('stripeToken')
-
-    try:
-        conn = psycopg2.connect(**db_config)
-        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-        cursor.execute("SELECT * FROM tickets WHERE id = %s", (ticket_id,))
-        ticket = cursor.fetchone()
-        price_id = ticket['stripe_id']  # Récupérer l'ID de prix Stripe
-        price = stripe.Price.retrieve(price_id)  # Récupérer l'objet prix Stripe
-
-        # Créer une session de paiement avec Stripe
-        session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[
-                {
-                    'price': price.id,
-                    'quantity': quantity,
-                },
-            ],
-            mode='payment',
-            success_url=url_for('success', _external=True),
-            cancel_url=url_for('cancel', _external=True),
-        )
-
-        return redirect(session.url)  # Rediriger vers l'URL de paiement Stripe
-    except stripe.error.StripeError as e:
-        flash(f"Erreur Stripe: {str(e)}", 'danger')
-    except psycopg2.Error as e:
-        conn.rollback()
-        flash('Erreur lors de l\'achat du billet.', 'danger')
-    finally:
-        if conn:
-            conn.close()
-        return redirect(url_for('tickets'))
 
 @app.route('/success')
 def success():
@@ -120,6 +77,34 @@ def success():
 def cancel():
     return render_template('cancel.html')
 
+@app.route('/process_purchase', methods=['POST'])
+def process_purchase():
+    ticket_id = request.form['ticket_id']
+    event_name = request.form['event_name']
+    event_date = request.form['event_date']
+    price = request.form['price']
+
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'eur',
+                    'product_data': {
+                        'name': event_name,
+                    },
+                    'unit_amount': int(float(price) * 100),  # Stripe expects amount in cents
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=url_for('success', _external=True),
+            cancel_url=url_for('cancel', _external=True),
+        )
+        return redirect(session.url, code=303)
+    except Exception as e:
+        flash('Erreur lors de la création de la session de paiement.', 'danger')
+        return redirect(url_for('tickets'))
 
 if __name__ == '__main__':
     app.run(debug=True)

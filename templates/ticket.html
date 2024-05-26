@@ -1,3 +1,4 @@
+<!-- ticket.html -->
 {% extends 'layout.html' %}
 
 {% block title %}
@@ -19,12 +20,13 @@
                                     <p class="card-text">Date: {{ ticket.event_date }}</p>
                                     <p class="card-text">Prix: €{{ ticket.price }}</p>
                                     <p class="card-text">Tickets disponibles: {{ ticket.available_tickets }}</p>
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#purchaseModal" 
-                                            data-ticket-id="{{ ticket.id }}" data-event-name="{{ ticket.event_name }}" 
-                                            data-event-date="{{ ticket.event_date }}" data-price="{{ ticket.price }}" 
-                                            data-available-tickets="{{ ticket.available_tickets }}"
-                                            data-event-id="{{ ticket.event_id }}">
-                                        Acheter
+                                    <button class="btn btn-primary purchase-button" 
+                                            data-toggle="modal" data-target="#purchaseModal" 
+                                            data-ticket-id="{{ ticket.id }}" 
+                                            data-event-name="{{ ticket.event_name }}" 
+                                            data-event-date="{{ ticket.event_date }}" 
+                                            data-price="{{ ticket.price }}">
+                                        Sélectionner ce ticket
                                     </button>
                                 </div>
                             </div>
@@ -40,41 +42,37 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Purchase Modal -->
 <div class="modal fade" id="purchaseModal" tabindex="-1" role="dialog" aria-labelledby="purchaseModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="purchase-form" action="{{ url_for('process_payment') }}" method="POST">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="purchaseModalLabel">Acheter un billet</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Événement:</strong> <span id="modal-event-name"></span></p>
-                    <p><strong>Date:</strong> <span id="modal-event-date"></span></p>
-                    <p><strong>Prix:</strong> €<span id="modal-price"></span></p>
-                    <p><strong>Tickets disponibles:</strong> <span id="modal-available-tickets"></span></p>
-                    <input type="hidden" name="ticket_id" id="modal-ticket-id">
-                    <input type="hidden" name="event_id" id="modal-event-id"> <!-- Champ ajouté pour l'ID de l'événement -->
-                    <input type="hidden" name="event_name" id="modal-event-name-input">
-                    <input type="hidden" name="event_date" id="modal-event-date-input">
-                    <input type="hidden" name="price" id="modal-price-input">
+            <div class="modal-header">
+                <h5 class="modal-title" id="purchaseModalLabel">Acheter un billet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="purchaseForm" action="{{ url_for('process_purchase') }}" method="POST">
                     <div class="form-group">
-                        <label for="quantity">Quantité:</label>
-                        <input type="number" name="quantity" class="form-control" min="1" max="" id="modal-quantity" required>
+                        <label for="event_name">Nom de l'évènement</label>
+                        <input type="text" class="form-control" id="event_name" name="event_name" readonly>
                     </div>
-                    <div id="stripe-card-element">
-                        <!-- Stripe Elements will be inserted here -->
+                    <div class="form-group">
+                        <label for="event_date">Date de l'évènement</label>
+                        <input type="text" class="form-control" id="event_date" name="event_date" readonly>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <div class="form-group">
+                        <label for="price">Prix</label>
+                        <input type="text" class="form-control" id="price" name="price" readonly>
+                    </div>
+                    <input type="hidden" id="ticket_id" name="ticket_id">
                     <button type="submit" class="btn btn-primary">Payer</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+
 {% endblock %}
