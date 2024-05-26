@@ -1,4 +1,3 @@
-<!-- ticket.html -->
 {% extends 'layout.html' %}
 
 {% block title %}
@@ -63,9 +62,13 @@
                         <input type="text" class="form-control" id="event_date" name="event_date" readonly>
                     </div>
                     <div class="form-group">
+                        <label for="quantity">Quantité</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="1">
+                    </div>
+                    <div class="form-group">
                         <label for="price">Prix</label>
                         <input type="text" class="form-control" id="price" name="price" readonly>
-                    </div>
+                    </div>             
                     <input type="hidden" id="ticket_id" name="ticket_id">
                     <button type="submit" class="btn btn-primary">Payer</button>
                 </form>

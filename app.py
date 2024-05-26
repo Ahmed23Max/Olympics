@@ -1,10 +1,11 @@
-from flask import Flask, render_template, session, request, jsonify, flash, redirect, url_for
+from flask import Flask, render_template, session, request, flash, redirect, url_for, jsonify
 from users import login, signup, logout, profile, update_profile
 from config import db_config, SECRET_KEY, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
-from donne import disciplines
 import stripe
 import psycopg2
 import psycopg2.extras
+from donne import disciplines
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -69,23 +70,18 @@ def tickets():
         if conn:
             conn.close()
 
-@app.route('/success')
-def success():
-    return render_template('success.html')
-
-@app.route('/cancel')
-def cancel():
-    return render_template('cancel.html')
-
 @app.route('/process_purchase', methods=['POST'])
 def process_purchase():
-    ticket_id = request.form['ticket_id']
-    event_name = request.form['event_name']
-    event_date = request.form['event_date']
-    price = request.form['price']
-
     try:
-        session = stripe.checkout.Session.create(
+        data = request.json
+        ticket_id = data.get('ticket_id')
+        event_name = data.get('event_name')
+        event_date = data.get('event_date')
+        price = data.get('price')
+        quantity = data.get('quantity')
+
+        # Créer une nouvelle session de paiement Stripe
+        stripe_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
@@ -93,18 +89,77 @@ def process_purchase():
                     'product_data': {
                         'name': event_name,
                     },
-                    'unit_amount': int(float(price) * 100),  # Stripe expects amount in cents
+                    'unit_amount': int(float(price) * 100),  # Stripe attend le montant en cents
                 },
-                'quantity': 1,
+                'quantity': int(quantity),  # Utiliser la quantité de tickets
             }],
             mode='payment',
-            success_url=url_for('success', _external=True),
+            success_url=url_for('success', _external=True, session_id='{CHECKOUT_SESSION_ID}'),
             cancel_url=url_for('cancel', _external=True),
+            metadata={
+                'ticket_id': ticket_id,
+                'user_id': session.get('user_id')
+            }
         )
-        return redirect(session.url, code=303)
+
+        # Mettre à jour le nombre de tickets disponibles et enregistrer la transaction
+        try:
+            ticket_id = int(stripe_session.metadata['ticket_id'])  # Convertir en entier
+            quantity = int(stripe_session.metadata['quantity'])    # Convertir en entier
+            event_name = stripe_session.metadata['event_name']     # Récupérer le nom de l'événement
+
+            # Mettre à jour le nombre de tickets disponibles
+            update_ticket_availability(ticket_id, quantity)
+
+            # Enregistrer les détails de la transaction
+            record_transaction(stripe_session.id, ticket_id, quantity, event_name)
+
+            flash('Votre achat a été réalisé avec succès.', 'success')
+        except Exception as e:
+            flash('Erreur lors de l\'enregistrement de la transaction: {}'.format(str(e)), 'danger')
+
+        return jsonify({'url': stripe_session.url}), 200
     except Exception as e:
-        flash('Erreur lors de la création de la session de paiement.', 'danger')
-        return redirect(url_for('tickets'))
+        return jsonify({'error': str(e)}), 500
+
+
+# Route de succès après un paiement Stripe réussi
+@app.route('/success')
+def success():
+    session_id = request.args.get('session_id')
+    return redirect(url_for('tickets'))
+
+@app.route('/cancel')
+def cancel():
+    return render_template('cancel.html')
+
+# Fonction pour mettre à jour le nombre de tickets disponibles dans la base de données
+def update_ticket_availability(ticket_id, quantity):
+    try:
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE tickets SET available_tickets = available_tickets - %s WHERE id = %s",
+            (quantity, ticket_id)
+        )
+        conn.commit()
+    finally:
+        if conn:
+            conn.close()
+
+# Fonction pour enregistrer les détails de la transaction dans la base de données
+def record_transaction(session_id, ticket_id, quantity, event_name):
+    try:
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO transactions (session_id, ticket_id, quantity, event_name, transaction_date) VALUES (%s, %s, %s, %s, %s)",
+            (session_id, ticket_id, quantity, event_name, datetime.now())
+        )
+        conn.commit()
+    finally:
+        if conn:
+            conn.close()
 
 if __name__ == '__main__':
     app.run(debug=True)
