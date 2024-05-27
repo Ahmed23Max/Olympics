@@ -9,7 +9,27 @@
 <div class="container mt-5">
     <h1 class="text-center text-success">Paiement réussi !</h1>
     <p class="text-center">Votre billet a été acheté avec succès.</p>
-    <div class="text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Détails du billet</h5>
+                    <p class="card-text">Nom de l'évènement: {{ event_name }}</p>
+                    <p class="card-text">Date de l'évènement: {{ event_date }}</p>
+                    <p class="card-text">Prix: {{ price }}</p>
+                    <p class="card-text">Quantité: {{ quantity }}</p>
+                    <p class="card-text">Nom complet: {{ full_name }}</p>
+                    <p class="card-text">Email: {{ email }}</p>
+                    <p class="card-text">Téléphone: {{ phone }}</p>
+                    <p class="card-text">Adresse: {{ address }}</p>
+                    <p class="card-text">Ville: {{ city }}</p>
+                    <p class="card-text">Code postal: {{ postal_code }}</p>
+                    <img src="{{ qr_code_path }}" alt="QR Code" class="img-fluid mx-auto d-block">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
         <a href="{{ url_for('tickets') }}" class="btn btn-primary">Retour aux billets</a>
     </div>
 </div>
