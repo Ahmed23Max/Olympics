@@ -77,6 +77,12 @@ def process_purchase():
         event_name = data.get('event_name')
         price = data.get('price')
         quantity = data.get('quantity')
+        full_name = data.get('full_name')
+        email = data.get('email')
+        phone = data.get('phone')
+        address = data.get('address')
+        city = data.get('city')
+        postal_code = data.get('postal_code')
 
         # Mettre à jour le nombre de tickets disponibles dans la base de données
         conn = psycopg2.connect(**db_config)
@@ -89,7 +95,7 @@ def process_purchase():
         # Enregistrer une trace de l'achat dans la base de données
         user_id = session.get('user_id', None)  # Assurez-vous que l'utilisateur est connecté
         if user_id:
-            cursor.execute("INSERT INTO purchases (user_id, ticket_id, quantity, price) VALUES (%s, %s, %s, %s)", (user_id, ticket_id, quantity, price))
+            cursor.execute("INSERT INTO purchases (user_id, ticket_id, quantity, price, full_name, email, phone, address, city, postal_code) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (user_id, ticket_id, quantity, price, full_name, email, phone, address, city, postal_code))
             conn.commit()
 
         cursor.close()
@@ -115,6 +121,7 @@ def process_purchase():
         return jsonify({'url': stripe_session.url}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @app.route('/success')
 def success():

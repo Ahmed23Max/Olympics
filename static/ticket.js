@@ -17,8 +17,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     var purchaseForm = document.getElementById('purchaseForm');
     purchaseForm.addEventListener('submit', (event) => {
-        // La quantité est déjà incluse dans le formulaire
-
         // Empêcher l'envoi par défaut du formulaire
         event.preventDefault();
 
@@ -29,6 +27,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
         var eventDate = formData.get('event_date');
         var price = formData.get('price');
         var quantity = formData.get('quantity');
+        var fullName = formData.get('full_name');
+        var email = formData.get('email');
+        var phone = formData.get('phone');
+        var address = formData.get('address');
+        var city = formData.get('city');
+        var postalCode = formData.get('postal_code');
 
         // Créer une nouvelle session de paiement Stripe
         fetch('/process_purchase', {
@@ -41,7 +45,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 event_name: eventName,
                 event_date: eventDate,
                 price: price,
-                quantity: quantity
+                quantity: quantity,
+                full_name: fullName,
+                email: email,
+                phone: phone,
+                address: address,
+                city: city,
+                postal_code: postalCode
             }),
         })
         .then(response => response.json())
