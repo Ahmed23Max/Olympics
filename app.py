@@ -1,11 +1,11 @@
 from flask import Flask, render_template, session, request, flash, redirect, url_for, jsonify
-from users import login, signup, logout, profile, update_profile
-from config import db_config, SECRET_KEY, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
 import stripe
 import psycopg2
 import psycopg2.extras
 from donne import disciplines
-from datetime import datetime
+from users import login, signup, logout, profile, update_profile
+from config import db_config, SECRET_KEY, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
+
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -42,7 +42,6 @@ def events():
 
 @app.route('/discipline/<int:discipline_id>')
 def discipline_details(discipline_id):
-    # Récupérer les détails de la discipline à partir de l'ID
     discipline = disciplines[discipline_id]
     return render_template('discipline_details.html', discipline=discipline)
 
@@ -76,11 +75,26 @@ def process_purchase():
         data = request.json
         ticket_id = data.get('ticket_id')
         event_name = data.get('event_name')
-        event_date = data.get('event_date')
         price = data.get('price')
         quantity = data.get('quantity')
 
-        # Créer une nouvelle session de paiement Stripe
+        # Mettre à jour le nombre de tickets disponibles dans la base de données
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Mettre à jour le nombre de tickets disponibles dans la base de données
+        cursor.execute("UPDATE tickets SET available_tickets = available_tickets - %s WHERE id = %s", (quantity, ticket_id))
+        conn.commit()
+
+        # Enregistrer une trace de l'achat dans la base de données
+        user_id = session.get('user_id', None)  # Assurez-vous que l'utilisateur est connecté
+        if user_id:
+            cursor.execute("INSERT INTO purchases (user_id, ticket_id, quantity, price) VALUES (%s, %s, %s, %s)", (user_id, ticket_id, quantity, price))
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
         stripe_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
@@ -89,77 +103,28 @@ def process_purchase():
                     'product_data': {
                         'name': event_name,
                     },
-                    'unit_amount': int(float(price) * 100),  # Stripe attend le montant en cents
+                    'unit_amount': int(float(price) * 100),
                 },
-                'quantity': int(quantity),  # Utiliser la quantité de tickets
+                'quantity': int(quantity),
             }],
             mode='payment',
-            success_url=url_for('success', _external=True, session_id='{CHECKOUT_SESSION_ID}'),
-            cancel_url=url_for('cancel', _external=True),
-            metadata={
-                'ticket_id': ticket_id,
-                'user_id': session.get('user_id')
-            }
+            success_url=url_for('success', _external=True),
+            cancel_url=url_for('cancel', _external=True)
         )
-
-        # Mettre à jour le nombre de tickets disponibles et enregistrer la transaction
-        try:
-            ticket_id = int(stripe_session.metadata['ticket_id'])  # Convertir en entier
-            quantity = int(stripe_session.metadata['quantity'])    # Convertir en entier
-            event_name = stripe_session.metadata['event_name']     # Récupérer le nom de l'événement
-
-            # Mettre à jour le nombre de tickets disponibles
-            update_ticket_availability(ticket_id, quantity)
-
-            # Enregistrer les détails de la transaction
-            record_transaction(stripe_session.id, ticket_id, quantity, event_name)
-
-            flash('Votre achat a été réalisé avec succès.', 'success')
-        except Exception as e:
-            flash('Erreur lors de l\'enregistrement de la transaction: {}'.format(str(e)), 'danger')
 
         return jsonify({'url': stripe_session.url}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-# Route de succès après un paiement Stripe réussi
 @app.route('/success')
 def success():
-    session_id = request.args.get('session_id')
+    flash('Votre achat a été confirmé avec succès.', 'success')
     return redirect(url_for('tickets'))
 
 @app.route('/cancel')
 def cancel():
-    return render_template('cancel.html')
-
-# Fonction pour mettre à jour le nombre de tickets disponibles dans la base de données
-def update_ticket_availability(ticket_id, quantity):
-    try:
-        conn = psycopg2.connect(**db_config)
-        cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE tickets SET available_tickets = available_tickets - %s WHERE id = %s",
-            (quantity, ticket_id)
-        )
-        conn.commit()
-    finally:
-        if conn:
-            conn.close()
-
-# Fonction pour enregistrer les détails de la transaction dans la base de données
-def record_transaction(session_id, ticket_id, quantity, event_name):
-    try:
-        conn = psycopg2.connect(**db_config)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO transactions (session_id, ticket_id, quantity, event_name, transaction_date) VALUES (%s, %s, %s, %s, %s)",
-            (session_id, ticket_id, quantity, event_name, datetime.now())
-        )
-        conn.commit()
-    finally:
-        if conn:
-            conn.close()
+    flash('Le paiement a été annulé.', 'info')
+    return redirect(url_for('tickets'))
 
 if __name__ == '__main__':
     app.run(debug=True)
