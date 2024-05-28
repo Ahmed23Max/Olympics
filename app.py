@@ -5,15 +5,10 @@ import psycopg2.extras
 from donne import disciplines
 from users import login, signup, logout, profile, update_profile
 from config import db_config, SECRET_KEY, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
-import qrcode
-import os
-import logging
-from unidecode import unidecode
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
-# Configuration du logging
-logging.basicConfig(filename='qr_code.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+
 # Configuration de la base de données
 app.config['db_config'] = db_config
 
@@ -153,49 +148,7 @@ def success():
     city = request.args.get('city')
     postal_code = request.args.get('postal_code')
 
-    # Générer le contenu du ticket avec les informations nécessaires
-    ticket_info = f"Event: {event_name}\nDate: {event_date}\nPrice: {price}\nQuantity: {quantity}\nName: {full_name}\nEmail: {email}\nPhone: {phone}\nAddress: {address}\nCity: {city}\nPostal Code: {postal_code}"
-
-    # Générer et sauvegarder le QR code
-    qr_code_path = generate_qr_code(ticket_info)
-
-    return render_template('success.html', event_name=event_name, event_date=event_date, price=price, quantity=quantity, full_name=full_name, email=email, phone=phone, address=address, city=city, postal_code=postal_code, qr_code_path=qr_code_path)
-
-
-
-def generate_qr_code(ticket_info):
-    try:
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(ticket_info)
-        qr.make(fit=True)
-
-        img = qr.make_image(fill_color="black", back_color="white")
-        
-        # Créer le répertoire s'il n'existe pas
-        directory = 'static/qrcodes'
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        
-        # Translittérer les caractères spéciaux en ASCII standard
-        filename = unidecode(ticket_info)
-        
-        # Remplacer les caractères spéciaux et les tirets bas par des tirets
-        filename = filename.replace(' ', '_').replace(':', '-').replace('.', '-')
-        
-        img_path = os.path.join(directory, f"{filename}.png")  # Utilisez os.path.join pour créer le chemin absolu
-        img.save(img_path)
-        logging.info(f"QR code généré avec succès : {img_path}")
-        return img_path
-    except Exception as e:
-        logging.error(f"Erreur lors de la génération du QR code : {e}")
-        raise
-
-
+    return render_template('success.html', event_name=event_name, event_date=event_date, price=price, quantity=quantity, full_name=full_name, email=email, phone=phone, address=address, city=city, postal_code=postal_code)
 
 
 @app.route('/cancel')
