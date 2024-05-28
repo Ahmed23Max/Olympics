@@ -132,6 +132,10 @@ def update_profile():
         except psycopg2.Error as e:
             conn.rollback()
             flash('Échec de la mise à jour du profil. Veuillez réessayer.', 'danger')
-            return redirect(url_for('profile'))
+            return redirect(url_for('profile'))  # Redirection en cas d'erreur
         finally:
-            conn.close
+            conn.close()
+
+    # Retourne une redirection par défaut si les conditions précédentes ne sont pas remplies
+    return redirect(url_for('login'))
+

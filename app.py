@@ -41,8 +41,11 @@ def events():
 
 @app.route('/discipline/<int:discipline_id>')
 def discipline_details(discipline_id):
-    discipline = disciplines[discipline_id]
-    return render_template('discipline_details.html', discipline=discipline)
+    if discipline_id < len(disciplines):
+        discipline = disciplines[discipline_id]
+        return render_template('discipline_details.html', discipline=discipline)
+    else:
+        return "Discipline not found", 404
 
 @app.route('/practical-info')
 def practical_info():
@@ -54,6 +57,7 @@ def sitemap():
 
 @app.route('/tickets')
 def tickets():
+    conn = None  # Initialisez la variable conn avant le bloc try
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
