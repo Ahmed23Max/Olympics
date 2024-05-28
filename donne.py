@@ -1,4 +1,3 @@
-# Définition des disciplines sportives avec leurs logos et descriptions
 disciplines = [
     {"name": "Athlétisme", "logo": "logo/athletics.jpg", "description": "Ne manquez pas les compétitions d'athlétisme mettant en vedette les meilleurs athlètes du monde."},
     {"name": "Aviron", "logo": "logo/rowing.jpg", "description": "Assistez aux épreuves d'aviron et soutenez votre équipe préférée."},
@@ -46,7 +45,6 @@ disciplines = [
 ]
 
 
-# Pays avec drapeau
 countries_with_flags = {
     "Albania": "🇦🇱",
     "Algeria": "🇩🇿",

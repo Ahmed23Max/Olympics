@@ -7,7 +7,6 @@
     <div>
         <div>
             <h2>Votre Profil</h2>
-            <!-- Afficher les informations du profil de l'utilisateur -->
             <ul>
                 <li><strong>Nom d'utilisateur :</strong> {{ user_name }}</li>
                 <li><strong>Email :</strong> {{ user_email }}</li>
@@ -24,7 +23,6 @@
         </div>
     </div>
 
-    <!-- Bouton Modifier -->
     <button id="editProfileButton" class="btn btn-primary mt-3">Modifier</button>
 
     <div id="editForm" style="display: none;">
@@ -46,7 +44,6 @@
                 <label for="phone_number">Numéro de Téléphone :</label>
                 <input type="text" id="phone_number" name="phone_number" class="form-control" value="{{ user_phone_number }}">
             </div>
-            <!-- Ajouter un bouton de soumission pour envoyer le formulaire -->
             <button type="submit" id="saveChangesButton" class="btn btn-primary">Enregistrer les Modifications</button>
             <button type="button" id="cancelEditButton" class="btn btn-secondary">Annuler</button>
         </form>

@@ -6,7 +6,6 @@ import uuid
 from donne import countries_with_flags
 from flask import current_app
 
-
 active_sessions = {}
 
 def login():
@@ -23,15 +22,12 @@ def login():
             user = cursor.fetchone()
 
             if user and check_password_hash(user[2], password):
-                # Générer un identifiant de session unique
                 session_id = str(uuid.uuid4())
 
-                # Stocker les données de l'utilisateur dans la session
                 session['user_id'] = user[0]
                 session['user_name'] = user[1]
                 session['user_email'] = user[3]
 
-                # Définir l'identifiant de session en tant que cookie
                 response = jsonify({"message": "Connexion réussie!"})
                 response.set_cookie('session_id', session_id)
                 return response
@@ -136,6 +132,4 @@ def update_profile():
         finally:
             conn.close()
 
-    # Retourne une redirection par défaut si les conditions précédentes ne sont pas remplies
     return redirect(url_for('login'))
-

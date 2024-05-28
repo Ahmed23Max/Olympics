@@ -9,28 +9,16 @@ from config import db_config, SECRET_KEY, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-# Configuration de la base de données
 app.config['db_config'] = db_config
 
-# Configuration de Stripe
 stripe.api_key = STRIPE_SECRET_KEY
 
-# Route de connexion
 app.add_url_rule('/login', 'login', login, methods=['POST'])
-
-# Route d'inscription
 app.add_url_rule('/signup', 'signup', signup, methods=['POST'])
-
-# Route de déconnexion
 app.add_url_rule('/logout', 'logout', logout)
-
-# Route de profil
 app.add_url_rule('/profile', 'profile', profile)
-
-# Route de mise à jour de profil
 app.add_url_rule('/update_profile', 'update_profile', update_profile, methods=['POST'])
 
-# Routes
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -57,7 +45,7 @@ def sitemap():
 
 @app.route('/tickets')
 def tickets():
-    conn = None  # Initialisez la variable conn avant le bloc try
+    conn = None
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -88,16 +76,13 @@ def process_purchase():
         city = data.get('city')
         postal_code = data.get('postal_code')
 
-        # Mettre à jour le nombre de tickets disponibles dans la base de données
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        # Mettre à jour le nombre de tickets disponibles dans la base de données
         cursor.execute("UPDATE tickets SET available_tickets = available_tickets - %s WHERE id = %s", (quantity, ticket_id))
         conn.commit()
 
-        # Enregistrer une trace de l'achat dans la base de données
-        user_id = session.get('user_id', None)  # Assurez-vous que l'utilisateur est connecté
+        user_id = session.get('user_id', None)
         if user_id:
             cursor.execute("INSERT INTO purchases (user_id, ticket_id, quantity, price, full_name, email, phone, address, city, postal_code) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (user_id, ticket_id, quantity, price, full_name, email, phone, address, city, postal_code))
             conn.commit()
@@ -140,7 +125,6 @@ def process_purchase():
 
 @app.route('/success')
 def success():
-    # Récupérer les informations du ticket depuis la requête
     event_name = request.args.get('event_name')
     event_date = request.args.get('event_date')
     price = request.args.get('price')
